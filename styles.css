@@ -1,13 +1,7 @@
 @font-face {
-    font-family: "Gagalin-Regular";
-    src: url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.eot");
-    src: url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.eot?#iefix")format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.woff2")format("woff2"),
-    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.woff")format("woff"),
-    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.ttf")format("truetype"),
-    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.svg#Gagalin-Regular")format("svg");
+    font-family: 'Gagalin';
+    src: url(Gagalin-Regular.ttf);
 }
-
 body {
     font-family: Gagalin-Regular;
     background-color: #e4e4ed;
