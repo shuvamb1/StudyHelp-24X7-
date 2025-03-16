@@ -1,14 +1,15 @@
 @font-face {
-    font-family: 'Gagalin';
-    src: url('./fonts/gagalin.woff2') format('woff2'), /* Super Modern Browsers */
-         url('./fonts/gagalin.woff') format('woff'), /* Pretty Modern Browsers */
-         url('./fonts/gagalin.ttf') format('truetype'); /* Safari, Android, iOS */
-    font-weight: normal;
-    font-style: normal;
+    font-family: "Gagalin-Regular";
+    src: url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.eot");
+    src: url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/240a7cb10b49b02c94ceddc459d385a9.svg#Gagalin-Regular")format("svg");
 }
 
 body {
-    font-family: Gagalin;
+    font-family: Gagalin-Regular;
     background-color: #e4e4ed;
 }
 header {
