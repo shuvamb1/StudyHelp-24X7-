@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'Gagalin';
+    src: url('./fonts/gagalin.woff2') format('woff2'), /* Super Modern Browsers */
+         url('./fonts/gagalin.woff') format('woff'), /* Pretty Modern Browsers */
+         url('./fonts/gagalin.ttf') format('truetype'); /* Safari, Android, iOS */
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     font-family: Gagalin;
     background-color: #e4e4ed;
@@ -11,6 +20,7 @@ header {
 }
 button {
     background-color: #5BC0DE;
+	font-size: 16px;
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
@@ -37,8 +47,9 @@ input, select {
 	font-size: 24px;
 }
 #logo {
-		cursor: pointer;
-	}
+	cursor: pointer;
+	font-size: 29px;
+}
 .fg {
 	display: flex;
 	justify-content: space-around;
@@ -58,29 +69,83 @@ input, select {
 .column button:hover {
     background-color: #4d91e8;
 }
-@media (max-width: 770px) {
-    .fg {
+@media (max-width: 426px) {
+	main {
+		float: center;
+	}
+	body {
+		float: center;
+	}
+	.fg {
 		display: block;
+		float: center;
 	}
 	.column {
-		width: 90%;
-	}
-	#logo {
-		font-size: 19px;
+		width: 92%;
+		float: center;
 	}
 	header {
 		display: block;
 		padding: 10px 10px 10px 10px;
 	}
 	#logo {
+		font-size: 30px;
+		float: center-right;
 		padding: 10px 10px 10px 10px;
 	}
 	.auth-buttons {
 		float:center;
-		
+	}
+	#login {
+		float:center;
+	}
+	#sign {
+		float: center;
 	}
 	#signupForm {
 		align-content: left;
 		font-size: 20px;
+	}
+}
+@media (max-width: 900px) and (min-width: 426px) {
+	button {
+		font-size: 15px;
+	}
+	.column {
+		width: 35%;
+		height: 75%;
+	}
+	#logf {
+		width: 50%;
+		float:center-right;
+	}
+	#signupForm {
+		align-content: left;
+		font-size: 15px;
+		float: center;
+	}
+}
+@media (max-width: 3000px) and (min-width: 2000px) {
+	button {
+		font-size: 35px;
+	}
+	.column {
+		width: 20%;
+		height: 100%;
+	}
+	#logf {
+		width: 55%;
+		float:center-right;
+	}
+	#signupForm {
+		align-content: left;
+		font-size: 35px;
+		float: center;
+	}
+	#logo {
+		font-size: 50px;
+	}
+	h1 {
+		font-size:45px;
 	}
 }
