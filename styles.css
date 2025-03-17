@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Gagalin';
-    src: url(Gagalin-Regular.ttf);
+    src: url(Gagalin-Regular.ttf),url(Gagalin-Regular.woff),url(Gagalin-Regular.woff2);
 }
 body {
     font-family: Gagalin-Regular;
