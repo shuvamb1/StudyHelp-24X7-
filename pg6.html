@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>StudyHelp 24x7</title>
+</head>
+<body bgcolor="#e4e4ed">
+    <header style="font-family:Gagalin">
+        <div id="logo">🌐 STUDYHELP 24X7</div>
+        <div class="auth-buttons" style="font-family:Gagalin">
+           <button id="login" style="font-family:Gagalin;color:white">SIGN IN</button>
+            <button id="sign" style="font-family:Gagalin;color:white">SIGN UP</button></div>
+    </header>
+    <div class="fg" style="font-family:Gagalin">
+        <div class="column">
+            <div class="icon"><img src="ppt.webp" style="height:50%;width:50%"></div>
+            <button id="cnote" style="background-color:#5BC0DE;color:white;font-family:Gagalin">C<br>NOTES</button>
+			<script src="script.js"></script>
+        </div>
+		&nbsp;
+        <div class="column">
+            <div class="icon"><img src="q.webp" style="height:50%;width:50%"></div>
+            <button id="cpyq" style="background-color:#5BC0DE;color:white;font-family:Gagalin">PREVIOUS YEAR<br>QUESTIONS</button>
+        </div>
+		&nbsp;
+        <div class="column">
+            <div class="icon"><img src="ad.jpg" style="height:50%;width:50%"></div>
+            <button id="cprn" style="background-color:#5BC0DE;color:white;font-family:Gagalin">PRACTICAL<BR>NOTES</button>
+        </div>
+		&nbsp;
+		<div class="column">
+            <div class="icon"><img src="books.jpg" style="height:50%;width:50%"></div>
+            <button id="cbooks" style="background-color:#5BC0DE;color:white;font-family:Gagalin">RELATED<BR>BOOKS</button>
+        </div>
+		<script src="script6.js"></script>
+		<script>
+		document.getElementById('login').addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+		document.getElementById('sign').addEventListener('click', function() {
+            window.location.href = 'Sign up.html';
+        });
+		document.getElementById('logo').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    </script>
+    </div>
+</body>
+</html>
