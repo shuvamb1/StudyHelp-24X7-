@@ -68,7 +68,7 @@ input, select {
     background-color: #4d91e8;
 }
 
-center {
+#mq {
 	font-size: 4rem;
 }
 @media (max-width: 426px) {
@@ -108,7 +108,7 @@ center {
 		align-content: left;
 		font-size: 20px;
 	}
-	center {
+	#mq {
 	font-size: 3rem;
 }
 }
@@ -129,7 +129,7 @@ center {
 		font-size: 15px;
 		float: center;
 	}
-	center {
+	#mq {
 	font-size: 3.5rem;
 }
 }
@@ -156,7 +156,7 @@ center {
 	h1 {
 		font-size:45px;
 	}
-	center {
+	#mq {
 	font-size: 4.5rem;
 }
 }
