@@ -20,6 +20,8 @@ button {
     border-radius: 5px;
     padding: 10px 20px;
     margin-left: 10px;
+	color: white;
+	font-family: Gagalin;
     cursor: pointer;
 	transition: transform .2s;
 }
@@ -49,6 +51,7 @@ input, select {
 	display: flex;
 	justify-content: space-around;
 	padding: 20px 10px;
+	background-color: #e4e4ed;
 }
 .w {
 	display: flex;
@@ -63,6 +66,10 @@ input, select {
 }
 .column button:hover {
     background-color: #4d91e8;
+}
+
+center {
+	font-size: 4rem;
 }
 @media (max-width: 426px) {
 	main {
@@ -101,6 +108,9 @@ input, select {
 		align-content: left;
 		font-size: 20px;
 	}
+	center {
+	font-size: 3rem;
+}
 }
 @media (max-width: 900px) and (min-width: 426px) {
 	button {
@@ -119,6 +129,9 @@ input, select {
 		font-size: 15px;
 		float: center;
 	}
+	center {
+	font-size: 3.5rem;
+}
 }
 @media (max-width: 3000px) and (min-width: 2000px) {
 	button {
@@ -143,4 +156,7 @@ input, select {
 	h1 {
 		font-size:45px;
 	}
+	center {
+	font-size: 4.5rem;
+}
 }
