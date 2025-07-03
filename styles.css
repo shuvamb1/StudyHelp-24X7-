@@ -3,16 +3,17 @@
     src: url(Gagalin-Regular.ttf),url(Gagalin-Regular.woff),url(Gagalin-Regular.woff2);
 }
 body {
-    font-family: Gagalin-Regular;
+    font-family: Tahoma;
 	background-color: #0d214e;
 	margin: 0px;
 }
 header {
+	font-family: Gagalin-Regular;
     display: flex;
     justify-content: space-between;
     padding: 20px;
     background-color: ##0d214e;
-    color: #5BC0DE;
+    color: white;
 }
 button {
     background-color: #0d214e;
