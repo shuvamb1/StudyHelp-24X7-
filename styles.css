@@ -3,8 +3,7 @@
     src: url(Gagalin-Regular.ttf),url(Gagalin-Regular.woff),url(Gagalin-Regular.woff2);
 }
 body {
-    font-family: Tahoma;
-	font-weight: bold;
+    font-family: Gagalin-Regular;
 	background-color: #0d214e;
 	margin: 0px;
 }
