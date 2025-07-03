@@ -16,6 +16,7 @@ header {
     color: white;
 }
 button {
+	font-family: Gagalin-Regular;
     background-color: #5BC0DE;
 	font-size: 16px;
     border: none;
