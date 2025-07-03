@@ -4,6 +4,7 @@
 }
 body {
     font-family: Tahoma;
+	font-weight: bold;
 	background-color: #0d214e;
 	margin: 0px;
 }
@@ -16,14 +17,13 @@ header {
     color: white;
 }
 button {
-    background-color: #0d214e;
+    background-color: #5BC0DE;
 	font-size: 16px;
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
     margin-left: 10px;
 	color: white;
-	font-family: Gagalin;
     cursor: pointer;
 	transition: transform .2s;
 }
