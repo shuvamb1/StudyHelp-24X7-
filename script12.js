@@ -20,7 +20,7 @@ document.getElementById('mpprn').addEventListener('click', function() {
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('mpbooks').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/file/d/18tL4jO3h2RyPgp1S4wZPqtOuOjFCPxg9/view?usp=sharing'; // Change this to the correct file path
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=18tL4jO3h2RyPgp1S4wZPqtOuOjFCPxg9'; // Change this to the correct file path
     const fileName = 'Microprocessor Books.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
