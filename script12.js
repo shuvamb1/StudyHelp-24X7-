@@ -10,12 +10,12 @@ function downloadFile(url, filename) {
 
 // Event listener for the button click
 document.getElementById('ssthe').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id=1O1ZLB3K4TE-aSNdC_olSZtH4P71YzCm5'; // Change this to the correct file path
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=1F0UmcQ6om3DHEDjGeHhXe-yHOwOO67db'; // Change this to the correct file path
     const fileName = 'Microprocessor Theory.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('mpprn').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id='; // Change this to the correct file path
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=1ugBIau04XpHEJNElfm52L90rwaMM3ELs'; // Change this to the correct file path
     const fileName = 'Microprocessor Practical.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
