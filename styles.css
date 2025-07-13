@@ -11,7 +11,7 @@ header {
 	font-family: Gagalin-Regular;
     display: flex;
     justify-content: space-between;
-    padding: 20px 25px 20px 25px;
+    padding: 30px 25px 20px 25px;
     background-color: #0d214e;
     color: white;
 }
@@ -114,10 +114,10 @@ input, select {
 		font-size: 20px;
 	}
 	#mq {
-	font-size: 1.7rem;	
+	font-size: 1.9rem;	
 	}
 	#gts {
-	font-size: 0.9rem;
+	font-size: 1.1rem;
 	}
 }
 @media (max-width: 900px) and (min-width: 426px) {
@@ -138,10 +138,10 @@ input, select {
 		float: center;
 	}
 	#mq {
-	font-size: 3rem;
+	font-size: 3.3rem;
 }
 	#gts {
-	font-size: 1.9rem;
+	font-size: 2.2rem;
 	}
 }
 @media (max-width: 3000px) and (min-width: 2000px) {
