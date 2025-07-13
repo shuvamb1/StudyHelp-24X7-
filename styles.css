@@ -12,7 +12,7 @@ header {
     display: flex;
     justify-content: space-between;
     padding: 20px;
-    background-color: ##0d214e;
+    background-color: #0d214e;
     color: white;
 }
 button {
@@ -53,7 +53,7 @@ input, select {
 	display: flex;
 	justify-content: space-around;
 	padding: 20px 10px;
-	background-color: #e4e4ed;
+	background-color: #0d214e;
 }
 .w {
 	display: flex;
