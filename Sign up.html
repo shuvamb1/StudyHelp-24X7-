@@ -25,13 +25,13 @@
 		 <h1>Sign Up</h1></center>
     <form id="signupForm">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="Name" required>
 <br><br>
         <label for="roll">Roll:</label>
-        <input type="number" id="roll" name="roll" required>
+        <input type="number" id="roll" name="Roll" required>
 <br><br>
         <label for="department">Dept:</label>
-        <select id="department" name="department" required>
+        <select id="department" name="Dept" required>
             <option value="">Select Department</option>
             <option value="Computer Science">Computer Science</option>
             <option value="Electronics">Microbiology</option>
@@ -40,7 +40,7 @@
         </select>
 <br><br>
         <label for="year">Year:</label>
-        <select id="year" name="year" required>
+        <select id="year" name="Year" required>
             <option value="">Select Year</option>
             <option value="1">1st Year</option>
             <option value="2">2nd Year</option>
@@ -49,18 +49,49 @@
         </select>
 <br><br>
         <label for="cin">CIN No:</label>
-        <input type="text" id="cin" name="cin" required>
+        <input type="text" id="cin" name="CIN_No" required>
 <br><br>
 <div style="float:right;height:20%;width:30%">
         <button type="submit" style="font-family:Gagalin;color:white;">Submit</button>
-    </div></form>
+    </div><br></form>
         </div>
     </div>
 	</div>
 	<script>
 	document.getElementById('logo').addEventListener('click', function() {
-            window.location.href = 'index1.html';
+            window.location.href = 'index.html';
         });
+document.getElementById('signupForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const data = {
+    name: document.getElementById('name').value,
+    roll: document.getElementById('roll').value,
+    department: document.getElementById('department').value,
+    year: document.getElementById('year').value,
+    cin: document.getElementById('cin').value
+  };
+
+  try {
+  const response = await fetch("http://localhost:5000/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const msg = await response.text();
+  if (!response.ok) {
+    alert("Error: " + msg);  // Show validation error
+  } else {
+    alert(msg);              // Show success message
+    document.getElementById("signupForm").reset();
+  }
+} catch (error) {
+  console.error(error);
+  alert("❌ Network error");
+}
+
+});
 	</script>
 </body>
 </html>
