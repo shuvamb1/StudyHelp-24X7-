@@ -76,6 +76,16 @@ input, select {
 #gts {
 	font-size: 2rem;
 	}
+.error {
+  color: red;
+  font-size: 1.1em;
+}
+
+.success {
+  color: green;
+  font-size: 0.9em;
+}
+
 @media (max-width: 426px) {
 	main {
 		float: center;
