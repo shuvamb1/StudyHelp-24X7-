@@ -62,6 +62,9 @@
 	    <center>IF YOU ALREADY REGISTERED BEFORE THEN GO TO SIGN IN</center>
 	</div>
 	<script>
+		document.getElementById('login').addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 const messageDiv = document.getElementById('regMessage');
