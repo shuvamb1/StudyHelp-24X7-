@@ -18,6 +18,9 @@
 <body bgcolor="#e4e4ed">
     <header style="font-family:Gagalin">
         <div id="logo">🌐 STUDYHELP 24X7</div>
+	    <div class="auth-buttons" style="font-family:Gagalin">
+            <button id="login" style="font-family:Gagalin;color:white">SIGN IN</button>
+        </div>
     </header>
     <div class="fg" style="font-family:Gagalin;">
         <div class="column">
@@ -50,20 +53,21 @@
 <br><br>
         <label for="cin">CIN No:</label>
         <input type="text" id="cin" name="CIN_No" required>
-<br><br>
+<br><br><div id="regMessage" class="error">
 <div style="float:right;height:20%;width:30%">
         <button type="submit" style="font-family:Gagalin;color:white;">Submit</button>
     </div><br></form>
         </div>
     </div>
+	    <center>IF YOU ALREADY REGISTERED BEFORE THEN GO TO SIGN IN</center>
 	</div>
 	<script>
-	document.getElementById('logo').addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-
+const messageDiv = document.getElementById('regMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    messageDiv.textContent = '';
+    messageDiv.className = '';
   const data = {
     name: document.getElementById('name').value,
     roll: document.getElementById('roll').value,
@@ -81,9 +85,16 @@ document.getElementById('signupForm').addEventListener('submit', async function(
 
   const msg = await response.text();
   if (!response.ok) {
-    alert("Error: " + msg);  // Show validation error
+    messageDiv.textContent = msg;
+      messageDiv.className = 'success';
+      submitBtn.style.display = 'none';
+
+      // Optional: redirect after 2 seconds
+      setTimeout(() => {
+        window.location.href = 'index1.html';
+      }, 2000);  // Show validation error
   } else {
-    alert(msg);              // Show success message
+    document.getElementById('regMessage').textContent = msg;             // Show success message
     document.getElementById("signupForm").reset();
   }
 } catch (error) {
