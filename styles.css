@@ -116,7 +116,7 @@ input, select {
 		float: center;
 	}
 	header {
-		display: inline;
+		display: flex;
 		padding: 8px 10px 8px 10px;
 	}
 	#logo {
@@ -150,7 +150,7 @@ input, select {
 		font-size: 13px;
 	}
 	header {
-		display: inline;
+		display: flex;
 		padding: 8px 10px 8px 10px;
 	}
 	#logo {
