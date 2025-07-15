@@ -73,6 +73,11 @@
       messageDiv.className = 'success';
       submitBtn.style.display = 'none';
       // Optional: redirect after 2 seconds
+	    const interval = setInterval(() => {
+    count = (count + 1) % 4;  // cycle through 0 to 3
+    loadingEl.textContent = baseText + '.'.repeat(count);
+  }, 1000);
+
       setTimeout(() => {
         window.location.href = 'index1.html';
       }, 2000);
