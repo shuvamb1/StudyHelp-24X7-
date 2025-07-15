@@ -56,13 +56,6 @@ input, select {
 	padding: 20px 10px;
 	background-color: #0d214e;
 }
-.fg1 {
-	float: center;
-	display: block;
-	justify-content: space-around;
-	padding: 20px 10px;
-	background-color: #0d214e;
-}
 .w {
 	display: flex;
 }
@@ -98,9 +91,7 @@ input, select {
 }
 
 @media (max-width: 426px) {
-	button {
-		font-size: 13px;
-	}
+	
 	main {
 		float: center;
 	}
@@ -148,9 +139,7 @@ input, select {
 	}
 }
 @media (max-width: 900px) and (min-width: 426px) {
-	button {
-		font-size: 13px;
-	}
+	
 	header {
 		display: flex;
 		padding: 8px 10px 8px 10px;
