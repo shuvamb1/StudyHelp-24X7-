@@ -15,13 +15,14 @@ header {
     background-color: #0d214e;
     color: white;
 }
+
 button {
 	font-family: Gagalin-Regular;
     background-color: #5BC0DE;
 	font-size: 16px;
     border: none;
     border-radius: 5px;
-    padding: 10px 20px;
+    padding: 10px 15px;
     margin-left: 10px;
 	color: white;
     cursor: pointer;
@@ -97,6 +98,9 @@ input, select {
 }
 
 @media (max-width: 426px) {
+	button {
+		font-size: 11px;
+	}
 	main {
 		float: center;
 	}
@@ -112,16 +116,16 @@ input, select {
 		float: center;
 	}
 	header {
-		display: block;
+		display: inline;
 		padding: 8px 10px 8px 10px;
 	}
 	#logo {
-		font-size: 30px;
+		font-size: 27px;
 		float: center-right;
 		padding: 10px 10px 10px 10px;
 	}
 	.auth-buttons {
-		float:center;
+		float:right;
 	}
 	#login {
 		float:center;
@@ -142,7 +146,19 @@ input, select {
 }
 @media (max-width: 900px) and (min-width: 426px) {
 	button {
-		font-size: 15px;
+		font-size: 13px;
+	}
+	header {
+		display: inline;
+		padding: 8px 10px 8px 10px;
+	}
+	#logo {
+		font-size: 27px;
+		float: center-right;
+		padding: 10px 10px 10px 10px;
+	}
+	.auth-buttons {
+		float:right;
 	}
 	.column {
 		width: 35%;
