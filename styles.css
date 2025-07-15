@@ -86,12 +86,14 @@ input, select {
 	}
 .error {
   color: red;
-  font-size: 0.5em;
+  font-size: 0.9em;
+  padding:2px;
 }
 
 .success {
   color: green;
   font-size: 0.9em;
+  padding:2px;
 }
 
 @media (max-width: 426px) {
