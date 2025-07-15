@@ -99,7 +99,7 @@ input, select {
 
 @media (max-width: 426px) {
 	button {
-		font-size: 11px;
+		font-size: 13px;
 	}
 	main {
 		float: center;
@@ -123,6 +123,7 @@ input, select {
 		font-size: 27px;
 		float: center-right;
 		padding: 10px 10px 10px 10px;
+		width: fit-content;
 	}
 	.auth-buttons {
 		float:right;
@@ -156,6 +157,7 @@ input, select {
 		font-size: 27px;
 		float: center-right;
 		padding: 10px 10px 10px 10px;
+		width: fit-content;
 	}
 	.auth-buttons {
 		float:right;
