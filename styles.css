@@ -126,7 +126,9 @@ input, select {
 		width: fit-content;
 	}
 	.auth-buttons {
-		float:right;
+		display: flex;
+      justify-content: center;
+      align-items: center;
 	}
 	#login {
 		float:center;
@@ -160,7 +162,9 @@ input, select {
 		width: fit-content;
 	}
 	.auth-buttons {
-		float:right;
+		display: flex;
+      justify-content: center;
+      align-items: center;
 	}
 	.column {
 		width: 35%;
