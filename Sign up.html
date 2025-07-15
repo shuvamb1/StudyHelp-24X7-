@@ -63,10 +63,10 @@
 document.getElementById('login').addEventListener('click', function () {
   window.location.href = 'login.html';
 });
-
+console.log("CIN entered:", cin);
 document.getElementById('signupForm').addEventListener('submit', async function (e) {
   e.preventDefault();
-
+const cin = document.getElementById('cin').value.trim();
   const messageDiv = document.getElementById('regMessage');
   const submitBtn = document.getElementById('submitBtn');
 const loginBtn = document.getElementById('loginBtn');
