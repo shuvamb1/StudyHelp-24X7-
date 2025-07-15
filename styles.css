@@ -72,7 +72,7 @@ input, select {
     text-align: center;
     padding: 10px;
     width: 20%;
-	float: center;
+    float: center;
 }
 .column button:hover {
     background-color: #4d91e8;
