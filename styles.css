@@ -55,6 +55,12 @@ input, select {
 	padding: 20px 10px;
 	background-color: #0d214e;
 }
+.fg1 {
+	display: block;
+	justify-content: space-around;
+	padding: 20px 10px;
+	background-color: #0d214e;
+}
 .w {
 	display: flex;
 }
