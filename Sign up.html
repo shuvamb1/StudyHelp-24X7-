@@ -60,7 +60,7 @@
         </div>
     </div>
 	</div>
-	<center style="color:white;font-size:1.6rem">IF YOU ALREADY REGISTERED BEFORE THEN GO TO SIGN IN</center>
+	<center id = "notice" style="color:white;font-size:1.6rem">IF YOU ALREADY REGISTERED BEFORE THEN GO TO SIGN IN</center>
 <script>
 document.getElementById('login').addEventListener('click', function () {
   window.location.href = 'login.html';
@@ -71,6 +71,11 @@ document.getElementById('signupForm').addEventListener('submit', async function 
 
   const messageDiv = document.getElementById('regMessage');
   const submitBtn = document.getElementById('submitBtn');
+const loginBtn = document.getElementById('loginBtn');
+	const loadingEl = document.getElementById('notice');
+	let count = 0;
+  const baseText = 'Loading';
+
   messageDiv.textContent = '';
   messageDiv.className = '';
 
@@ -105,10 +110,15 @@ document.getElementById('signupForm').addEventListener('submit', async function 
       messageDiv.textContent = msg;
       messageDiv.className = 'success';
       submitBtn.style.display = 'none';
+	    loginBtn.style.display = 'none';
+	    const interval = setInterval(() => {
+    count = (count + 1) % 4;  // cycle through 0 to 3
+    loadingEl.textContent = baseText + '.'.repeat(count);
+  }, 1000);
 
       setTimeout(() => {
         window.location.href = 'index1.html';
-      }, 2000);
+      }, 3000);
     }
   } catch (error) {
     console.error(error);
