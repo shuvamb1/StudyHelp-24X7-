@@ -12,6 +12,9 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-B31J01CXSV');
+	if (sessionStorage.getItem('entryFromIndex') !== 'true') {
+    window.location.href = 'index.html';
+  }
 </script>
 </head>
 <body bgcolor="#e4e4ed">
