@@ -30,3 +30,9 @@ document.getElementById('ospyq').addEventListener('click', function() {
     const fileName = 'Discrete Mathamatics PYQ.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
+document.getElementById('logo').addEventListener('click', function() {
+            window.location.href = 'index1.html';
+        });
+		document.getElementById('ask').addEventListener('click', function() {
+            window.location.href = 'https://studyhelp-24x7.onrender.com';
+        });
