@@ -16,7 +16,7 @@
 	if (sessionStorage.getItem('entryFromIndex') !== 'true') {
     window.location.href = 'index.html';
   }
-  history.pushState(null, null, window.location.href);
+  history.pushState(null,window.location.href);
   window.onpopstate = function () {
     history.go(1); // disables back
   };
