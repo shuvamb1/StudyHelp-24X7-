@@ -8,6 +8,7 @@ body {
 	margin: 0px;
 }
 header {
+	position: fixed;
 	font-family: Gagalin-Regular;
     display: flex;
     justify-content: space-between;
