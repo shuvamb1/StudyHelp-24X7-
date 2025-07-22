@@ -90,13 +90,63 @@ input, select {
   padding:2px;
 }
 @media (max-width: 371px) {
+	main {
+		float: center;
+	}
+	body {
+		float: center;
+	}
+	.fg {
+		display: block;
+		float: center;
+	}
+	.column {
+		width: 92%;
+		float: center;
+	}
+	header {
+		display: flex;
+		padding: 8px 10px 8px 10px;
+	}
 	#logo {
 		font-size: 21px;
 		float: center-right;
 		padding: 8px 8px 8px 8px;
 		width: fit-content;
 	}
-	
+	.auth-buttons {
+		display: flex;
+      justify-content: center;
+      align-items: center;
+	}
+	#login {
+		float:center;
+	}
+	#sign {
+		float: center;
+	}
+	#signupForm {
+		align-content: left;
+		font-size: 19px;
+	}
+	#mq {
+	font-size: 2.1rem;	
+	}
+	#gts {
+	font-size: 1.2rem;
+	}
+	button {
+	font-family: Gagalin-Regular;
+    background-color: #5BC0DE;
+	font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin-left: 8px;
+	color: white;
+    cursor: pointer;
+	transition: transform .2s;
+}
 }
 @media (max-width: 426px) and (min-width: 371px) {
 	
