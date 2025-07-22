@@ -54,7 +54,7 @@
     messageDiv.textContent = '';
     messageDiv.className = '';
 
-    const name = document.getElementById('name').value.trim();
+    const name = document.getElementById('name').value;
     const cin = document.getElementById('cin').value;
 
     const response = await fetch('https://studyhelp-backend-m4ff.onrender.com/login', {
