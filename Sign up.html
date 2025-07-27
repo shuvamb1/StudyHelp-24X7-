@@ -81,7 +81,7 @@ const cinPattern = /^2[3-5]-400-4-02-05\d{2}$/;
     return; // stop submission
   }
   const data = {
-    name: document.getElementById('name').value,
+    name: document.getElementById('name').value.trim(),
     roll: document.getElementById('roll').value,
     department: document.getElementById('department').value,
     year: document.getElementById('year').value,
