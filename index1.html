@@ -17,6 +17,47 @@
     window.location.href = 'index.html';
   }
 </script>
+	<style>
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 2px solid #5BC0DE;
+  width: 80%;
+  max-width: 400px;
+  font-family: Gagalin;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  text-align: center;
+  position: relative;
+}
+
+.close-btn {
+  color: #aaa;
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+</style>
 </head>
 <body bgcolor="#e4e4ed">
     <header style="font-family:Gagalin">
@@ -26,6 +67,12 @@
 			<button id="ask" style="font-family:Gagalin;color:white">ASK</button>
         </div>
     </header>
+	<div id="popupModal" class="popup">
+  <div class="popup-content">
+    <span class="close-btn" id="closePopup">&times;</span>
+    <p>You can use the <strong>ASK</strong> button to ask any doubt about any Computer Science subject.</p>
+  </div>
+</div>
     <main style="font-family:Gagalin">
 	<div class="fg">
         <div class="column">
@@ -147,6 +194,24 @@
 		document.getElementById('ask').addEventListener('click', function() {
             window.location.href = 'https://studyhelp-24x7.onrender.com';
         });
+			window.onload = function () {
+  setTimeout(function() {
+    document.getElementById("popupModal").style.display = "block";
+  }, 1000);
+};
+
+// Close popup on clicking X
+document.getElementById("closePopup").onclick = function() {
+  document.getElementById("popupModal").style.display = "none";
+};
+
+// Optional: Close popup when clicking outside the modal
+window.onclick = function(event) {
+  const popup = document.getElementById("popupModal");
+  if (event.target === popup) {
+    popup.style.display = "none";
+  }
+};
     </script>
     </main>
 	<br>
