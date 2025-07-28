@@ -24,8 +24,13 @@ document.getElementById('albooks').addEventListener('click', function() {
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('alpyq').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id='; // Change this to the correct file path
-    const fileName = 'Microprocessor PYQ.zip'; // Specify the file name
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=1XvR2J18M2VIegER5zSKRCa9UYkxpJ-Wt'; // Change this to the correct file path
+    const fileName = 'algo PYQ.zip'; // Specify the file name
+    downloadFile(fileUrl, fileName);
+});
+document.getElementById('alprn').addEventListener('click', function() {
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=1kzoks5eEC_JJK5p4q1wyNZ-jg5Jk_sAp'; // Change this to the correct file path
+    const fileName = 'algo prn.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('logo').addEventListener('click', function() {
