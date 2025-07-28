@@ -24,7 +24,7 @@ document.getElementById('swebooks').addEventListener('click', function() {
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('swepyq').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id='; // Change this to the correct file path
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=1afpYkLlq3olbTNJumj8YxVQdpj8kg5lu'; // Change this to the correct file path
     const fileName = 'Microprocessor PYQ.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
