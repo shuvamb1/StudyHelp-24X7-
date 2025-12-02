@@ -24,8 +24,8 @@ document.getElementById('netbooks').addEventListener('click', function() {
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('netpyq').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id=1Llnth3RIkLvs2XaxV3dSoUzgz3r2TeWN'; // Change this to the correct file path
-    const fileName = 'Microprocessor PYQ.zip'; // Specify the file name
+    const fileUrl = 'https://drive.google.com/uc?export=download&id=1VEzAVZm4Cqv069XQwFZKLgETmb8rMTTg'; // Change this to the correct file path
+    const fileName = 'Networks PYQ.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('logo').addEventListener('click', function() {
@@ -34,3 +34,4 @@ document.getElementById('logo').addEventListener('click', function() {
 		document.getElementById('ask').addEventListener('click', function() {
             window.location.href = 'https://studyhelp-24x7.onrender.com';
         });
+
