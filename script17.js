@@ -21,12 +21,12 @@ document.getElementById('aiprn').addEventListener('click', function() {
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('aibooks').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id=18tL4jO3h2RyPgp1S4wZPqtOuOjFCPxg9'; // Change this to the correct file path
+    const fileUrl = 'https://drive.google.com/uc?export=download&id='; // Change this to the correct file path
     const fileName = 'Microprocessor Books.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
 document.getElementById('aipyq').addEventListener('click', function() {
-    const fileUrl = 'https://drive.google.com/uc?export=download&id=13woZn2lBB-IDoSP18MZIGbrbxptsep8H'; // Change this to the correct file path
+    const fileUrl = 'https://drive.google.com/uc?export=download&id='; // Change this to the correct file path
     const fileName = 'Microprocessor PYQ.zip'; // Specify the file name
     downloadFile(fileUrl, fileName);
 });
