@@ -66,16 +66,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadMaterials() {
+        if (!container) {
+            console.error('materials-container element not found');
+            return;
+        }
+
+        if (typeof API_BASE_URL === 'undefined') {
+            container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 1.1rem; padding: 40px;">Configuration error: API URL not set. Make sure js/config.js is loaded.</p>';
+            return;
+        }
+
         container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 1.1rem; padding: 40px;">Loading materials...</p>';
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/materials`);
-            if (!response.ok) throw new Error('Failed to load materials');
+            if (!response.ok) throw new Error(`Failed to load materials (${response.status})`);
             materialsData = await response.json();
             applyFilters(true);
         } catch (err) {
-            console.error(err);
-            container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 1.1rem; padding: 40px;">Unable to load materials right now. Please try again later.</p>';
+            console.error('Materials load failed:', err);
+            container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 1.1rem; padding: 40px;">Unable to load materials right now. Check that the backend URL in js/config.js matches your Render service.</p>';
         }
     }
 
