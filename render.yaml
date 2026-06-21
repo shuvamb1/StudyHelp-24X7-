@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: studyhelp-backend
+    runtime: node
+    rootDir: studyhelp-backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_NAME
+        sync: false
+      - key: ADMIN_CIN
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

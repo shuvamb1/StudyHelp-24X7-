@@ -3,113 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>StudyHelp 24x7</title>
-	<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-B31J01CXSV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-B31J01CXSV');
-</script>
+    <title>Login | StudyHelp 24x7</title>
+    <link rel="stylesheet" href="css/loader.css">
+    <script src="js/page-loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body { background-color: var(--bg-section); }
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .auth-card {
+            background: var(--bg-white);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            border-top: 5px solid var(--accent-color);
+        }
+        .auth-header { text-align: center; margin-bottom: 30px; }
+        .auth-header .logo-img { height: 60px; margin-bottom: 15px; }
+        .auth-header h2 { margin-bottom: 5px; }
+        
+        .auth-footer { text-align: center; margin-top: 20px; font-size: 0.95rem; display: flex; flex-direction: column; gap: 10px; }
+        .error-msg { color: black; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; display: none; text-align: center; }
+        .success-msg { display: none; }
+    </style>
 </head>
-<body bgcolor="#e4e4ed">
-    <header style="font-family:Gagalin">
-        <div id="logo">🌐 STUDYHELP 24X7</div>
-        
-    </header>
-    <div class="fg" style="font-family:Gagalin">
-        <div class="column">
-		<div id="logf" style="text-align:left;padding:40px 40px"><center>
-		 <h1>SIGN IN</h1></center>
-    <form id="signupForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-<br><div id="nameError" class="error"></div><br>
-        
-        <label for="cin">CIN No:</label>
-        <input type="text" id="cin" name="cin" required>
-<br><div id="cinError" class="error"></div><div id="loginMessage" class="error"></div><div id="notice" style="font-size:1.1rem;padding:2px"></div>
-<div style="float:right;height:20%;width:30%">
-        <button id = "submitBtn" type="submit" style="font-family:Gagalin;color:white">Submit</button>
-    </div><br></form>
+<body>
 
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="index.html"><img src="assets/images/logo.png" alt="Logo" class="logo-img"></a>
+                <h2 id="loginTitle">Welcome Back</h2>
+                <p class="text-muted" id="loginSubtitle">Login to access your dashboard.</p>
+            </div>
+            
+            <div id="errorMsg" class="error-msg"></div>
+            <div id="successMsg" class="success-msg"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="nameInput" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">College Identification Number (CIN)</label>
+                    <input type="text" id="cinInput" class="form-control" placeholder="Enter your 10-digit CIN" required>
+                </div>
+
+                <div class="form-group" id="passwordGroup" style="margin-bottom: 15px; display: none;">
+                    <label class="form-label">Secret Password</label>
+                    <input type="password" id="passwordInput" class="form-control" placeholder="Enter admin password">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;" id="loginBtn">Login</button>
+            </form>
+            
+            <div class="auth-footer">
+                <div>Don't have an account? <a href="register.html" style="font-weight: 600;">Sign Up</a></div>
+                <div><a href="#" id="toggleAdminBtn" style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">Login as Admin</a></div>
+            </div>
         </div>
     </div>
-	</div>
-	<script>
-         document.getElementById('signupForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
 
-    // Clear previous messages
-		 const loadingEl = document.getElementById('notice');
-	let count = 0;
-  const baseText = 'Loading';
-    document.getElementById('nameError').textContent = '';
-    document.getElementById('cinError').textContent = '';
-    const messageDiv = document.getElementById('loginMessage');
-    const submitBtn = document.getElementById('submitBtn');
-    messageDiv.textContent = '';
-    messageDiv.className = '';
+    <script src="js/config.js"></script>
+    <script>
+        if (localStorage.getItem('token')) {
+            window.location.replace('index.html');
+        }
 
-    const name = document.getElementById('name').value.trim();
-    const cin = document.getElementById('cin').value;
+        let isAdminLogin = false;
+        const toggleBtn = document.getElementById('toggleAdminBtn');
+        const passwordGroup = document.getElementById('passwordGroup');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginTitle = document.getElementById('loginTitle');
+        const loginSubtitle = document.getElementById('loginSubtitle');
 
-    const response = await fetch('https://studyhelp-backend-czz3.onrender.com/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, cin })
-    });
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isAdminLogin = !isAdminLogin;
+            if (isAdminLogin) {
+                passwordGroup.style.display = 'block';
+                passwordInput.required = true;
+                loginTitle.innerText = 'Admin Login';
+                loginSubtitle.innerText = 'Access the admin dashboard.';
+                toggleBtn.innerText = 'Back to User Login';
+            } else {
+                passwordGroup.style.display = 'none';
+                passwordInput.required = false;
+                passwordInput.value = '';
+                loginTitle.innerText = 'Welcome Back';
+                loginSubtitle.innerText = 'Login to access your dashboard.';
+                toggleBtn.innerText = 'Login as Admin';
+            }
+        });
 
-    const msg = await response.text();
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('nameInput').value.trim();
+            const cin = document.getElementById('cinInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            const btn = document.getElementById('loginBtn');
+            
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = 'Logging in...';
 
-    if (response.ok) {
-      messageDiv.textContent = msg;
-      messageDiv.className = 'success';
-      submitBtn.style.display = 'none';
-      // Optional: redirect after 2 seconds
-	    const interval = setInterval(() => {
-    count = (count + 1) % 4;  // cycle through 0 to 3
-    loadingEl.textContent = baseText + '.'.repeat(count);
-  }, 1000);
+            const endpoint = isAdminLogin ? '/admin-login' : '/login';
+            const bodyData = isAdminLogin ? { name, cin, password } : { name, cin };
 
-      setTimeout(() => {
-        window.location.replace("index1.html");;
-      }, 3000);
-    } else {
+            try {
+                const response = await fetch(API_BASE_URL + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
 
-      // Optional: Show near specific field
-      if (msg.includes('CIN')) {
-        document.getElementById('cinError').textContent = msg;
-      } else if (msg.includes('Name')) {
-        document.getElementById('nameError').textContent = msg;
-      }
-    }
-  });
-</script>
-<br>
-  <footer style="
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  color: black;
-  text-align: center;
-  padding: 7px 10px;
-  font-family: Gagalin;
-  font-size: 0.8rem;
-  z-index: 1000;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-">
-  📱 If you face any issue, kindly <a href="https://wa.me/918981109323" target="_blank" style="color: #075e54; text-decoration: none; font-weight: bold;">WhatsApp us at 8981109323</a>
-</footer>
-
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    window.location.replace(isAdminLogin ? 'admin-dashboard.html' : 'index.html');
+                } else {
+                    const errText = await response.text();
+                    errorMsg.innerText = errText;
+                    errorMsg.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerText = 'Login';
+                }
+            } catch (err) {
+                errorMsg.innerText = 'Cannot connect to server.';
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerText = 'Login';
+            }
+        });
+    </script>
 </body>
 </html>
-
-
-
-

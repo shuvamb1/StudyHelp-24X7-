@@ -1,0 +1,5 @@
+studyhelp-backend/node_modules/
+studyhelp-backend/.env
+studyhelp-backend/uploads/
+.DS_Store
+Thumbs.db

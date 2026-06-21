@@ -3,33 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>StudyHelp 24x7</title>
-	<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-B31J01CXSV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-B31J01CXSV');
- sessionStorage.setItem('entryFromIndex', 'true');
-</script>
+    <title>StudyHelp 24x7 | St. Xavier's College Kolkata</title>
+    <link rel="stylesheet" href="css/loader.css">
+    <script src="js/page-loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body bgcolor="#e4e4ed">
-    <header style="font-family:Gagalin">
-        <div id="logo">🌐 STUDYHELP 24X7</div>
+<body>
+
+    <!-- Header / Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-3">
+        <div class="container">
+            <nav class="navbar mx-auto max-w-5xl px-4 rounded-2xl transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 border border-transparent bg-transparent">
+                <a href="index.html" class="logo-container">
+                    <img src="assets/images/logo.png" alt="StudyHelp 24x7 Logo" class="logo-img">
+                    <div class="logo-text">
+                        <span class="logo-main">StudyHelp 24x7</span>
+                        <span class="logo-sub">St. Xavier's College</span>
+                    </div>
+                </a>
+                
+                <button class="mobile-menu-btn" aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links">
+                    <li><a href="index.html" style="color: var(--accent-color);">Home</a></li>
+                    <li><a href="materials.html">Study Materials</a></li>
+                    <li><a href="contribute.html">Contribute</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                
+                    <li class="mobile-only-actions">
+                        <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; margin-bottom: 10px;">Login</a>
+                        <a href="register.html" class="btn btn-primary" style="width: 100%; text-align: center;">Sign Up</a>
+                    </li></ul>
+                
+                <div class="nav-actions">
+                    <a href="login.html" class="btn btn-outline">Login</a>
+                    <a href="register.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </nav>
+        </div>
     </header>
-    <div class="fg" style="font-family:Gagalin">
-        <center id="mq" style="padding:2%;color:white">Focus on your goals, stay strong and wise,
-Success is near, just open your eyes.
-Every small effort builds your way,
-Keep learning, keep growing—win the day!<br><br><button id="gts" style="font-family:Gagalin">Go to study</button></center>
-		<script>
-		document.getElementById('gts').addEventListener('click', function() {
-            window.location.href = 'Sign up.html';
-        });
-    </script>
-    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- 1. Hero Section -->
+        <section class="hero-section">
+            <div class="container hero-content reveal">
+                <h1 class="hero-title">Your Complete Academic Hub at <span style="color: #6600FF;">St. Xavier's College</span></h1>
+                <p class="hero-subtitle">Access department-wise notes, previous year question papers (PYQs), PPTs, and curated study materials whenever you need them. Master your semester with resources tailored precisely to your syllabus.</p>
+                <div class="hero-actions">
+                    <a href="materials.html" class="btn btn-accent" style="margin-right: 15px;">Access Materials</a>
+                    <a href="register.html" class="btn btn-outline">Join the Community</a>
+                </div>
+            </div>
+        </section>
+
+
+
+                        <!-- 3. Browse by Department Slider -->
+        <section class="py-5 bg-section" id="dept-slider-section">
+            <div class="container reveal">
+                <div class="department-carousel-container">
+                    <!-- Slide 1 -->
+                    <div class="dept-slide active" data-slide="0">
+                        <div class="dept-slide-content">
+                            <h3 class="dept-slide-title">Computer Science</h3>
+                            <p class="dept-slide-desc">Access detailed notes, practical lab assignments, presentation slides, and comprehensive Previous Year Question (PYQ) papers tailored specifically for both B.Sc and M.Sc curriculums. From core programming algorithms to advanced data structures, everything is meticulously organized to ensure you're exam-ready.</p>
+                            <div><a href="materials.html?dept=cs" class="btn btn-primary mt-2">Go to department hub</a></div>
+                        </div>
+                        <div class="dept-slide-image-wrapper">
+                            <div class="dept-slide-border"></div>
+                            <img src="assets/images/computerscience.webp" alt="Computer Science">
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="dept-slide" data-slide="1">
+                        <div class="dept-slide-content">
+                            <h3 class="dept-slide-title">Microbiology</h3>
+                            <p class="dept-slide-desc">Dive into high-quality PDFs, rigorous lab manuals, and peer-reviewed lecture notes precisely curated for your specialized papers. Master complex microbiological concepts, immunology, and genetics through a vast collection of student-verified resources designed for St. Xavier's demanding syllabus.</p>
+                            <div><a href="materials.html?dept=micro" class="btn btn-primary mt-2">Go to department hub</a></div>
+                        </div>
+                        <div class="dept-slide-image-wrapper">
+                            <div class="dept-slide-border"></div>
+                            <img src="assets/images/microbiology.jpg" alt="Microbiology">
+                        </div>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="dept-slide" data-slide="2">
+                        <div class="dept-slide-content">
+                            <h3 class="dept-slide-title">Statistics & Math</h3>
+                            <p class="dept-slide-desc">Master complex derivations, theorems, and challenging problem sets with our neatly organized question banks and step-by-step assignment solutions. Whether you're tackling calculus, linear algebra, or advanced probability distributions, find the exact study aids you need to excel.</p>
+                            <div><a href="materials.html?dept=stats" class="btn btn-primary mt-2">Go to department hub</a></div>
+                        </div>
+                        <div class="dept-slide-image-wrapper">
+                            <div class="dept-slide-border"></div>
+                            <img src="assets/images/math&amp;stat.jpg" alt="Statistics & Math">
+                        </div>
+                    </div>
+                    <!-- Slide 4 -->
+                    <div class="dept-slide" data-slide="3">
+                        <div class="dept-slide-content">
+                            <h3 class="dept-slide-title">Physics</h3>
+                            <p class="dept-slide-desc">Explore comprehensive derivations, in-depth theoretical concepts, and meticulously documented lab manuals organized precisely by semester. Access premium study guides covering classical mechanics, quantum physics, and electromagnetism to build a robust foundational understanding.</p>
+                            <div><a href="materials.html?dept=physics" class="btn btn-primary mt-2">Go to department hub</a></div>
+                        </div>
+                        <div class="dept-slide-image-wrapper">
+                            <div class="dept-slide-border"></div>
+                            <img src="assets/images/physics.jpg" alt="Physics">
+                        </div>
+                    </div>
+                    <!-- Slide 5 -->
+                    <div class="dept-slide" data-slide="4">
+                        <div class="dept-slide-content">
+                            <h3 class="dept-slide-title">B.Com (Commerce)</h3>
+                            <p class="dept-slide-desc">Stay ahead with up-to-date accounting standards, advanced financial management notes, business law summaries, and an extensive archive of previous year question papers. Empower your commerce journey with resources that simplify complex corporate taxation and economics topics.</p>
+                            <div><a href="materials.html?dept=bcom" class="btn btn-primary mt-2">Go to department hub</a></div>
+                        </div>
+                        <div class="dept-slide-image-wrapper">
+                            <div class="dept-slide-border"></div>
+                            <img src="assets/images/commerce.jpg" alt="Commerce">
+                        </div>
+                    </div>
+                    <!-- Slide 6 -->
+                    <div class="dept-slide" data-slide="5">
+                        <div class="dept-slide-content">
+                            <h3 class="dept-slide-title">English</h3>
+                            <p class="dept-slide-desc">Delve deep into comprehensive literary criticisms, structural essay outlines, and detailed chapter-by-chapter thematic analysis. Access rich study materials covering classical literature to modern poetry, curated to help you craft compelling arguments and secure top grades.</p>
+                            <div><a href="materials.html?dept=english" class="btn btn-primary mt-2">Go to department hub</a></div>
+                        </div>
+                        <div class="dept-slide-image-wrapper">
+                            <div class="dept-slide-border"></div>
+                            <img src="assets/images/english.avif" alt="English">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Improved About Section -->
+        <section class="py-5 bg-section">
+            <div class="container reveal">
+                <div class="about-layout">
+                    <div class="about-text">
+                        <h2>Empowering Xavierians Academically</h2>
+                        <p style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 20px;">StudyHelp 24x7 is a peer-supported learning initiative designed to make academic resources effortlessly accessible. We believe that finding the right notes shouldn't be the hardest part of your semester.</p>
+                        <p style="color: var(--text-muted); margin-bottom: 30px;">By organizing materials semester-wise and crowdsourcing contributions from the student community, we ensure that every student has the tools they need to prepare effectively and excel in their coursework. Community contribution is at the heart of our platform.</p>
+                        <a href="about.html" class="btn btn-outline">Discover Our Mission</a>
+                    </div>
+                    <div class="about-graphics">
+                        <div class="community-text reveal">
+                            <h3 class="community-heading">Built by students,<br>for students</h3>
+                            <p class="community-subtext">Join a community committed to collaborative success. Upload, share, and grow together.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-5 bg-white">
+            <div class="container reveal">
+                <div class="text-center mb-3">
+                    <h2>Frequently Asked Questions</h2>
+                    <p class="text-muted">Everything you need to know about StudyHelp 24x7</p>
+                </div>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">Are the study materials verified?</div>
+                        <div class="faq-answer">While we rely on community contributions, our moderators try to review the notes for general relevance and accuracy before publishing. However, we always recommend cross-checking with official college syllabus and professors.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">How can I contribute my own notes?</div>
+                        <div class="faq-answer">You can easily upload your notes by navigating to the "Contribute" page. Make sure your files are in PDF, DOCX, or PPTX format. Once uploaded, they will be sent for review.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Is the platform officially affiliated with St. Xavier's College?</div>
+                        <div class="faq-answer">No, StudyHelp 24x7 is an independent student-led initiative created by and for the students of St. Xavier's College.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Is it free to use?</div>
+                        <div class="faq-answer">Yes, completely! StudyHelp 24x7 is and always will be free for all students of St. Xavier's College. Our goal is to democratize academic resources for everyone.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">How do I get in touch if I have an issue?</div>
+                        <div class="faq-answer">You can reach us directly on WhatsApp at +91 8981109323 or email us at shuvambhattacharya896@gmail.com. We typically respond within 24 hours.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="logo-container" style="margin-bottom: 20px;">
+                        <img src="assets/images/logo.png" alt="StudyHelp 24x7 Logo" style="height: 40px; ">
+                        <div class="logo-text">
+                            <span class="logo-main" style="color: white;">StudyHelp 24x7</span>
+                        </div>
+                    </div>
+                    <p>Empowering students of St. Xavier's College, Kolkata with a 24x7 accessible, premium academic resource hub.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="color: white; margin-right: 15px; font-size: 1.2rem;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: white; margin-right: 15px; font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: white; font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="materials.html">Study Materials</a></li>
+                        <li><a href="contribute.html">Contribute Notes</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#faq">FAQs</a></li>
+                        <li><a href="https://wa.me/918981109323" target="_blank">WhatsApp Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-links">
+                        <li style="color: #CBD5E0; margin-bottom: 12px;"><i class="fas fa-envelope" style="margin-right: 10px; color: var(--accent-color);"></i> shuvambhattacharya896@gmail.com</li>
+                        <li>
+                            <a href="https://wa.me/918981109323" target="_blank" style="display: flex; align-items: center;">
+                                <i class="fab fa-whatsapp" style="margin-right: 10px; color: var(--accent-color); font-size: 1.2rem;"></i> WhatsApp Us
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                &copy; <span id="current-year"></span> StudyHelp 24x7. All rights reserved. Not officially affiliated with St. Xavier's College administration.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

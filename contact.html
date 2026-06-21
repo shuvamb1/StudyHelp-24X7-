@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | StudyHelp 24x7</title>
+    <link rel="stylesheet" href="css/loader.css">
+    <script src="js/page-loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .contact-layout {
+            max-width: 900px;
+            margin: 60px auto;
+        }
+        
+        .contact-info {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .contact-info h3 { color: var(--accent-color); margin-bottom: 20px; }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .contact-item i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .contact-form {
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E2E8F0;
+        }
+        
+        .faq-section {
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+        .faq-item {
+            background: var(--bg-white);
+            border: 1px solid #E2E8F0;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        .faq-answer {
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .contact-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-3">
+        <div class="container">
+            <nav class="navbar mx-auto max-w-5xl px-4 rounded-2xl transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 border border-transparent bg-transparent">
+                <a href="index.html" class="logo-container">
+                    <img src="assets/images/logo.png" alt="StudyHelp 24x7 Logo" class="logo-img">
+                    <div class="logo-text">
+                        <span class="logo-main">StudyHelp 24x7</span>
+                        <span class="logo-sub">St. Xavier's College</span>
+                    </div>
+                </a>
+                <button class="mobile-menu-btn" aria-expanded="false"><i class="fas fa-bars"></i></button>
+                                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="materials.html">Study Materials</a></li>
+                    <li><a href="contribute.html">Contribute</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                
+                    <li class="mobile-only-actions">
+                        <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; margin-bottom: 10px;">Login</a>
+                        <a href="register.html" class="btn btn-primary" style="width: 100%; text-align: center;">Sign Up</a>
+                    </li></ul>
+                <div class="nav-actions">
+                    <a href="login.html" class="btn btn-outline">Login</a>
+                    <a href="register.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top:110px;">
+        <div class="contact-layout">
+            <div class="contact-info">
+                <h3>Get in Touch</h3>
+                <p style="color: #E2E8F0; margin-bottom: 40px;">Have questions about the platform, want to report an issue, or simply want to say hello? Reach out to us through any of the channels below.</p>
+                
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>+91 8981109323</span>
+                </div>
+                
+                <div style="margin-top: 50px;">
+                    <a href="https://wa.me/918981109323" target="_blank" class="btn btn-accent" style="width: 100%;"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="faq" class="faq-section">
+            <h2 class="text-center" style="margin-bottom: 30px;">Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <div class="faq-question">Are the study materials verified?</div>
+                <div class="faq-answer">While we rely on community contributions, our moderators try to review the notes for general relevance and accuracy before publishing. However, we always recommend cross-checking with official college syllabus and professors.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">How can I contribute my own notes?</div>
+                <div class="faq-answer">You can easily upload your notes by navigating to the "Contribute" page. Make sure your files are in PDF, DOCX, or PPTX format. Once uploaded, they will be sent for review.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Is the platform officially affiliated with St. Xavier's College?</div>
+                <div class="faq-answer">No, StudyHelp 24x7 is an independent student-led initiative created by and for the students of St. Xavier's College.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="logo-container" style="margin-bottom: 20px;">
+                        <img src="assets/images/logo.png" alt="StudyHelp 24x7 Logo" style="height: 40px; ">
+                        <div class="logo-text">
+                            <span class="logo-main" style="color: white;">StudyHelp 24x7</span>
+                        </div>
+                    </div>
+                    <p>Empowering students of St. Xavier's College, Kolkata with a 24x7 accessible, premium academic resource hub.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="color: white; margin-right: 15px; font-size: 1.2rem;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: white; margin-right: 15px; font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: white; font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="materials.html">Study Materials</a></li>
+                        <li><a href="contribute.html">Contribute Notes</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="contact.html#faq">FAQs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-links">
+                        <li style="color: #CBD5E0; margin-bottom: 12px;"><i class="fas fa-envelope" style="margin-right: 10px; color: var(--accent-color);"></i> shuvambhattacharya896@gmail.com</li>
+                        <li>
+                            <a href="https://wa.me/918981109323" target="_blank" style="display: flex; align-items: center;">
+                                <i class="fab fa-whatsapp" style="margin-right: 10px; color: var(--accent-color); font-size: 1.2rem;"></i> WhatsApp Us
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                &copy; <span id="current-year"></span> StudyHelp 24x7. All rights reserved. Not officially affiliated with St. Xavier's College administration.
+            </div>
+        </div>
+    </footer>
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+
+
