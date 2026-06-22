@@ -5,11 +5,79 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyFiltersBtn = document.querySelector('.filter-sidebar .btn-primary');
 
     let materialsData = [];
+    let currentPage = 1;
+    const itemsPerPage = 8;
+
+    function renderPagination(totalItems, currentPage) {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const existingPagination = document.querySelector('.pagination-container');
+        if (existingPagination) existingPagination.remove();
+
+        if (totalPages <= 1) return;
+
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination-container';
+        paginationContainer.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px; flex-wrap: wrap;';
+
+        // Prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'btn btn-outline';
+        prevBtn.style.cssText = 'padding: 6px 12px; font-size: 0.85rem;';
+        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                applyFilters(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+        paginationContainer.appendChild(prevBtn);
+
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = 'btn';
+            pageBtn.style.cssText = `padding: 6px 12px; font-size: 0.85rem; min-width: 36px; ${i === currentPage ? 'background-color: var(--primary-color); color: white; border-color: var(--primary-color);' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => {
+                currentPage = i;
+                applyFilters(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            paginationContainer.appendChild(pageBtn);
+        }
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn btn-outline';
+        nextBtn.style.cssText = 'padding: 6px 12px; font-size: 0.85rem;';
+        nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                applyFilters(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+        paginationContainer.appendChild(nextBtn);
+
+        // Results count
+        const resultsCount = document.createElement('div');
+        resultsCount.style.cssText = 'width: 100%; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 8px;';
+        resultsCount.textContent = `Showing ${Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}-${Math.min(currentPage * itemsPerPage, totalItems)} of ${totalItems} materials`;
+        paginationContainer.appendChild(resultsCount);
+
+        container.parentElement.appendChild(paginationContainer);
+    }
 
     function renderMaterials(data) {
         container.innerHTML = '';
         if (data.length === 0) {
             container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 1.1rem; padding: 40px;">No materials found matching your criteria.</p>';
+            const existingPagination = document.querySelector('.pagination-container');
+            if (existingPagination) existingPagination.remove();
             return;
         }
 
@@ -58,11 +126,40 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesSearch && matchesAnyFilter;
         });
 
-        if (isInitialLoad && checkedOptions.length === 0 && searchQuery === '') {
-            filtered = filtered.slice(0, 8);
-        }
+        // Always paginate - show 8 per page
+        const totalItems = filtered.length;
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
 
-        renderMaterials(filtered);
+        renderMaterials(paginated);
+        renderPagination(totalItems, currentPage);
+    }
+
+    function parseUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dept = urlParams.get('dept');
+        
+        const deptMap = {
+            'cs': 'Computer Science',
+            'micro': 'Microbiology',
+            'stats': 'Statistics',
+            'physics': 'Physics',
+            'bcom': 'B.Com (Commerce)',
+            'english': 'English'
+        };
+
+        if (dept && deptMap[dept]) {
+            const deptName = deptMap[dept];
+            const checkboxes = document.querySelectorAll('.filter-option input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                const label = cb.parentElement.textContent.trim();
+                if (label === deptName) {
+                    cb.checked = true;
+                }
+            });
+            // Reset to page 1 when applying URL filter
+            currentPage = 1;
+        }
     }
 
     async function loadMaterials() {
@@ -82,6 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${API_BASE_URL}/api/materials`);
             if (!response.ok) throw new Error(`Failed to load materials (${response.status})`);
             materialsData = await response.json();
+            
+            parseUrlParams();
             applyFilters(true);
         } catch (err) {
             console.error('Materials load failed:', err);
@@ -92,16 +191,25 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMaterials();
 
     if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', applyFilters);
+        applyFiltersBtn.addEventListener('click', () => {
+            currentPage = 1;
+            applyFilters();
+        });
     }
 
     if (searchBtn) {
-        searchBtn.addEventListener('click', applyFilters);
+        searchBtn.addEventListener('click', () => {
+            currentPage = 1;
+            applyFilters();
+        });
     }
 
     if (searchInput) {
         searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') applyFilters();
+            if (e.key === 'Enter') {
+                currentPage = 1;
+                applyFilters();
+            }
         });
     }
 
