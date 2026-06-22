@@ -37,6 +37,13 @@
     hideLoader();
   });
 
+  // Fix back-button infinite loading: hide loader when page is restored from bfcache
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      hideLoader();
+    }
+  });
+
   document.addEventListener('click', function (event) {
     var link = event.target.closest('a');
     if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
