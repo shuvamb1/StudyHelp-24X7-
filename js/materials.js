@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const itemsPerPage = 8;
 
-    function renderPagination(totalItems, currentPage) {
+    function renderPagination(totalItems, activePage) {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         const existingPagination = document.querySelector('.pagination-container');
         if (existingPagination) existingPagination.remove();
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= totalPages; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.className = 'btn';
-            pageBtn.style.cssText = `padding: 6px 12px; font-size: 0.85rem; min-width: 36px; ${i === currentPage ? 'background-color: var(--primary-color); color: white; border-color: var(--primary-color);' : ''}`;
+            pageBtn.style.cssText = `padding: 6px 12px; font-size: 0.85rem; min-width: 36px; ${i === activePage ? 'background-color: var(--primary-color); color: white; border-color: var(--primary-color);' : ''}`;
             pageBtn.textContent = i;
             pageBtn.addEventListener('click', () => {
                 currentPage = i;
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.className = 'btn btn-outline';
         nextBtn.style.cssText = 'padding: 6px 12px; font-size: 0.85rem;';
         nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.disabled = activePage === totalPages;
         nextBtn.addEventListener('click', () => {
             if (currentPage < totalPages) {
                 currentPage++;
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Results count
         const resultsCount = document.createElement('div');
         resultsCount.style.cssText = 'width: 100%; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 8px;';
-        resultsCount.textContent = `Showing ${Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}-${Math.min(currentPage * itemsPerPage, totalItems)} of ${totalItems} materials`;
+        resultsCount.textContent = `Showing ${Math.min((activePage - 1) * itemsPerPage + 1, totalItems)}-${Math.min(activePage * itemsPerPage, totalItems)} of ${totalItems} materials`;
         paginationContainer.appendChild(resultsCount);
 
         container.parentElement.appendChild(paginationContainer);
