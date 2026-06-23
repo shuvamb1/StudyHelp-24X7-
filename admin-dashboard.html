@@ -557,16 +557,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Year</label>
+                            <label class="form-label">Year (optional)</label>
                             <input type="text" id="paperYear" class="form-control" placeholder="e.g. 2023">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Total Marks</label>
-                            <input type="number" id="paperTotalMarks" class="form-control" value="30" min="5" max="200" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Duration (minutes)</label>
-                            <input type="number" id="paperDuration" class="form-control" value="60" min="10" max="180" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -1235,13 +1227,10 @@
                     }
 
                     list.innerHTML = papers.map(p => {
-                        const hasQuestions = (p.totalQuestions || 0) > 0;
                         const pdfCount = (p.pdfFiles && p.pdfFiles.length) || (p.pdfUrl ? 1 : 0);
-                        const status = hasQuestions
-                            ? '<span style="color: #059669; font-size: 0.8rem;"><i class="fas fa-check-circle"></i> Ready</span>'
-                            : pdfCount > 0
-                                ? '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-clock"></i> Needs Generation</span>'
-                                : '<span style="color: #9ca3af; font-size: 0.8rem;"><i class="fas fa-upload"></i> Needs PDFs</span>';
+                        const status = pdfCount > 0
+                            ? '<span style="color: #059669; font-size: 0.8rem;"><i class="fas fa-check-circle"></i> Has PDFs</span>'
+                            : '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-upload"></i> Needs PDFs</span>';
                         return `
                         <div class="admin-material-item" id="mocktest-${p._id}">
                             <div style="flex: 1;">
@@ -1250,16 +1239,12 @@
                                     <span><strong>Subject:</strong> ${p.subject || 'N/A'}</span>
                                     <span><strong>Dept:</strong> ${p.department || 'N/A'}</span>
                                     <span><strong>Sem:</strong> ${p.semester || 'N/A'}</span>
-                                    <span><strong>Marks:</strong> ${p.totalMarks || 0}</span>
-                                    <span><strong>Duration:</strong> ${p.duration || 60} min</span>
                                     <span><strong>PDFs:</strong> ${pdfCount}</span>
-                                    <span><strong>Questions:</strong> ${p.totalQuestions || 0}</span>
                                     <span>${status}</span>
                                 </div>
                             </div>
                             <div class="pending-actions" style="margin-top: 0; flex-wrap: wrap;">
                                 ${p.pdfUrl ? `<a href="${p.pdfUrl}" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF</a>` : ''}
-                                <button onclick="generateQuestions('${p._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" ${pdfCount === 0 ? 'disabled' : ''} title="Generate questions from all PDFs using AI"><i class="fas fa-magic"></i> Generate</button>
                                 <button onclick="deleteMockTest('${p._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
@@ -1267,38 +1252,6 @@
                     }).join('');
                 } catch (err) {
                     list.innerHTML = '<p class="text-danger" style="text-align:center; padding: 20px;">Failed to load mock test papers.</p>';
-                }
-            };
-
-            window.generateQuestions = async (id) => {
-                if (!confirm('AI will read ALL uploaded PDFs for this paper and generate questions. This may take 10-30 seconds. Continue?')) return;
-                const btn = document.querySelector(`#mocktest-${id} .btn-primary`);
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Working...';
-                }
-                try {
-                    const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/${id}/generate`, {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        showMockTestsMsg(data.message || 'AI generated questions successfully!');
-                        fetchMockTests();
-                    } else {
-                        showMockTestsMsg(data.error || 'Generation failed.', true);
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-magic"></i> Generate';
-                        }
-                    }
-                } catch (err) {
-                    showMockTestsMsg('Server error during generation.', true);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-magic"></i> Generate';
-                    }
                 }
             };
 
@@ -1336,17 +1289,13 @@
                             subject: document.getElementById('paperSubject').value,
                             department: document.getElementById('paperDepartment').value,
                             semester: document.getElementById('paperSemester').value,
-                            year: document.getElementById('paperYear').value,
-                            totalMarks: Number(document.getElementById('paperTotalMarks').value),
-                            duration: Number(document.getElementById('paperDuration').value)
+                            year: document.getElementById('paperYear').value
                         })
                     });
                     const data = await res.json();
                     if (res.ok) {
                         showCreatePaperMsg(data.message || 'Paper created successfully!');
                         e.target.reset();
-                        document.getElementById('paperTotalMarks').value = '30';
-                        document.getElementById('paperDuration').value = '60';
                         fetchMockTests();
                     } else {
                         showCreatePaperMsg(data.error || 'Failed to create paper.', true);
