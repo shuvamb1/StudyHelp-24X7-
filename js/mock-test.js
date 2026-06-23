@@ -53,8 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             noPapers.style.display = 'none';
-            grid.innerHTML = papers.map(paper => `
-                <div class="paper-card" onclick="window.showInstructions('${paper._id}')">
+            grid.innerHTML = papers.map(paper => {
+                const hasQuestions = (paper.totalQuestions || 0) > 0;
+                return `
+                <div class="paper-card ${hasQuestions ? '' : 'paper-card-disabled'}">
                     <div class="paper-card-header">
                         <div class="paper-title">${escapeHtml(paper.title)}</div>
                         <span class="paper-badge">${escapeHtml(paper.department)}</span>
@@ -78,8 +80,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="paper-stat-label">Minutes</div>
                         </div>
                     </div>
+                    ${hasQuestions ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
                 </div>
-            `).join('');
+            `;
+            }).join('');
+
+            // Attach click handlers only to cards with questions
+            grid.querySelectorAll('.paper-card').forEach((card, index) => {
+                if ((papers[index].totalQuestions || 0) > 0) {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => {
+                        window.showInstructions(papers[index]._id);
+                    });
+                }
+            });
         } catch (err) {
             console.error(err);
             loading.innerHTML = '<p style="color: #dc2626;">Failed to load papers. Please try again.</p>';
@@ -90,6 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showInstructions = function(paperId) {
         currentPaper = papers.find(p => p._id === paperId);
         if (!currentPaper) return;
+        if ((currentPaper.totalQuestions || 0) === 0) {
+            alert('This paper does not have any questions yet. Please check back later.');
+            return;
+        }
 
         document.getElementById('inst-paper-title').textContent = currentPaper.title;
         document.getElementById('inst-questions').textContent = currentPaper.totalQuestions || 0;
