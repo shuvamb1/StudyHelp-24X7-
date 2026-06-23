@@ -471,6 +471,7 @@
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="materials.html">Study Materials</a></li>
+                    <li><a href="mock-test.html">Mock Tests</a></li>
                     <li><a href="contribute.html">Contribute</a></li>
                     <li><a href="about.html">About Us</a></li>
                 
@@ -517,6 +518,10 @@
 
             <div class="glass-card animated delay-2">
                 <h2 class="section-header"><i class="fas fa-brain"></i> AI Mock Test Training</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                    <i class="fas fa-magic" style="color: var(--accent-color);"></i>
+                    Upload a Previous Year Question (PYQ) PDF and our AI will automatically scan it, extract questions, and generate similar multiple-choice questions for students to practice.
+                </p>
                 <div id="aiTrainMsg" style="display:none; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; padding: 10px; border-radius: 6px;"></div>
                 <form id="aiTrainForm" enctype="multipart/form-data">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
@@ -565,11 +570,11 @@
                         <input type="file" id="pyqFile" class="form-control" accept=".pdf" required>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
-                        <i class="fas fa-upload"></i> Upload Paper
+                        <i class="fas fa-upload"></i> Upload & AI Generate Questions
                     </button>
                 </form>
                 <button class="btn btn-outline" style="width: 100%;" onclick="showAddQuestionsModal()">
-                    <i class="fas fa-plus-circle"></i> Add Questions to Paper
+                    <i class="fas fa-plus-circle"></i> Add Questions Manually (Fallback)
                 </button>
             </div>
 
@@ -1138,7 +1143,12 @@
                         return;
                     }
 
-                    list.innerHTML = papers.map(p => `
+                    list.innerHTML = papers.map(p => {
+                        const hasQuestions = (p.totalQuestions || 0) > 0;
+                        const aiStatus = hasQuestions
+                            ? '<span style="color: #059669; font-size: 0.8rem;"><i class="fas fa-check-circle"></i> AI Ready</span>'
+                            : '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-clock"></i> AI Generating...</span>';
+                        return `
                         <div class="admin-material-item" id="mocktest-${p._id}">
                             <div>
                                 <div class="admin-material-title">${p.title || 'Untitled'}</div>
@@ -1149,16 +1159,51 @@
                                     <span><strong>Questions:</strong> ${p.totalQuestions || 0}</span>
                                     <span><strong>Marks:</strong> ${p.totalMarks || 0}</span>
                                     <span><strong>Duration:</strong> ${p.duration || 60} min</span>
+                                    <span>${aiStatus}</span>
                                 </div>
                             </div>
-                            <div class="pending-actions" style="margin-top: 0;">
+                            <div class="pending-actions" style="margin-top: 0; flex-wrap: wrap;">
                                 ${p.pdfUrl ? `<a href="${p.pdfUrl}" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF</a>` : ''}
+                                <button onclick="regenerateAI('${p._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" title="Regenerate questions with AI"><i class="fas fa-magic"></i> AI Regen</button>
                                 <button onclick="deleteMockTest('${p._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
-                    `).join('');
+                    `;
+                    }).join('');
                 } catch (err) {
                     list.innerHTML = '<p class="text-danger" style="text-align:center; padding: 20px;">Failed to load mock test papers.</p>';
+                }
+            };
+
+            window.regenerateAI = async (id) => {
+                if (!confirm('This will delete all existing questions and regenerate them with AI using the uploaded PDF. Continue?')) return;
+                const btn = document.querySelector(`#mocktest-${id} .btn-primary`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Working...';
+                }
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/${id}/generate`, {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showMockTestsMsg(data.message || 'AI questions generated successfully!');
+                        fetchMockTests();
+                    } else {
+                        showMockTestsMsg(data.error || 'AI generation failed.', true);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-magic"></i> AI Regen';
+                        }
+                    }
+                } catch (err) {
+                    showMockTestsMsg('Server error during AI generation.', true);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-magic"></i> AI Regen';
+                    }
                 }
             };
 
@@ -1201,7 +1246,7 @@
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        showMockTestsMsg('Paper uploaded successfully! Now add questions.');
+                        showMockTestsMsg(data.message || 'Paper uploaded successfully! AI is generating questions in the background.');
                         e.target.reset();
                         document.getElementById('pyqDuration').value = '60';
                         fetchMockTests();
