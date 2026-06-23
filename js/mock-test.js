@@ -1,62 +1,56 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // ========== STATE ==========
-    let papers = [];
-    let currentPaper = null;
-    let questions = [];
-    let userAnswers = {}; // questionId -> selectedOptionIndex
-    let currentQuestionIndex = 0;
-    let timerInterval = null;
-    let timeRemaining = 0;
-    let testSubmitted = false;
-    let tabSwitchCount = 0;
-    const MAX_TAB_SWITCHES = 2;
-    let testResult = null;
+(function() {
+    'use strict';
 
-    // ========== DOM ELEMENTS ==========
+    const API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000';
+    const token = localStorage.getItem('token');
+
+    // Screens
     const selectionScreen = document.getElementById('selection-screen');
     const instructionsScreen = document.getElementById('instructions-screen');
     const testScreen = document.getElementById('test-screen');
     const resultsScreen = document.getElementById('results-screen');
-    const mainHeader = document.getElementById('main-header');
-    const mainFooter = document.getElementById('main-footer');
-    const mainContent = document.getElementById('main-content');
     const blurOverlay = document.getElementById('blur-overlay');
     const tabWarningOverlay = document.getElementById('tab-warning-overlay');
 
-    // ========== AUTH CHECK ==========
-    if (!localStorage.getItem('token')) {
-        window.location.href = 'login.html?redirect=mock-test.html';
-        return;
-    }
+    // State
+    let papers = [];
+    let currentPaper = null;
+    let testId = null;
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let answers = {};
+    let timerInterval = null;
+    let secondsLeft = 0;
+    let testActive = false;
+    let blurCount = 0;
+    const MAX_BLUR = 3;
 
-    const token = localStorage.getItem('token');
-
-    // ========== LOAD PAPERS ==========
-    async function loadPapers() {
-        const grid = document.getElementById('papers-grid');
+    // ====== LOAD PAPERS ======
+    async function fetchPapers() {
         const loading = document.getElementById('papers-loading');
+        const grid = document.getElementById('papers-grid');
         const noPapers = document.getElementById('no-papers');
 
         try {
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/papers`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-            if (!res.ok) throw new Error('Failed to load papers');
+            if (!res.ok) throw new Error('Failed to load');
             papers = await res.json();
 
             loading.style.display = 'none';
-
-            if (papers.length === 0) {
-                noPapers.style.display = 'block';
+            if (!papers.length) {
                 grid.innerHTML = '';
+                noPapers.style.display = 'block';
                 return;
             }
-
             noPapers.style.display = 'none';
+
             grid.innerHTML = papers.map(paper => {
-                const hasQuestions = (paper.totalQuestions || 0) > 0;
+                const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
+                const hasPDFs = pdfCount > 0;
                 return `
-                <div class="paper-card ${hasQuestions ? '' : 'paper-card-disabled'}">
+                <div class="paper-card ${hasPDFs ? '' : 'paper-card-disabled'}">
                     <div class="paper-card-header">
                         <div class="paper-title">${escapeHtml(paper.title)}</div>
                         <span class="paper-badge">${escapeHtml(paper.department)}</span>
@@ -65,169 +59,136 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span><i class="fas fa-book"></i> ${escapeHtml(paper.subject)}</span>
                         <span><i class="fas fa-calendar"></i> ${escapeHtml(paper.semester)}</span>
                         <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(paper.year || 'N/A')}</span>
+                        <span><i class="fas fa-file-pdf"></i> ${pdfCount} PYQ PDF(s)</span>
                     </div>
                     <div class="paper-stats">
                         <div class="paper-stat">
-                            <div class="paper-stat-value">${paper.totalQuestions || 0}</div>
-                            <div class="paper-stat-label">Questions</div>
-                        </div>
-                        <div class="paper-stat">
-                            <div class="paper-stat-value">${paper.totalMarks || 0}</div>
-                            <div class="paper-stat-label">Marks</div>
-                        </div>
-                        <div class="paper-stat">
-                            <div class="paper-stat-value">${paper.duration || 60}</div>
-                            <div class="paper-stat-label">Minutes</div>
+                            <div class="paper-stat-value">${pdfCount}</div>
+                            <div class="paper-stat-label">PYQs</div>
                         </div>
                     </div>
-                    ${hasQuestions ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
+                    ${hasPDFs ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
                 </div>
             `;
             }).join('');
 
-            // Attach click handlers only to cards with questions
             grid.querySelectorAll('.paper-card').forEach((card, index) => {
-                if ((papers[index].totalQuestions || 0) > 0) {
+                const paper = papers[index];
+                const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
+                if (pdfCount > 0) {
                     card.style.cursor = 'pointer';
-                    card.addEventListener('click', () => {
-                        window.showInstructions(papers[index]._id);
-                    });
+                    card.addEventListener('click', () => showConfigureScreen(paper));
                 }
             });
         } catch (err) {
-            console.error(err);
-            loading.innerHTML = '<p style="color: #dc2626;">Failed to load papers. Please try again.</p>';
+            loading.innerHTML = '<p class="text-danger">Failed to load papers. Please try again.</p>';
         }
     }
 
-    // ========== SHOW INSTRUCTIONS ==========
-    window.showInstructions = function(paperId) {
-        currentPaper = papers.find(p => p._id === paperId);
-        if (!currentPaper) return;
-        if ((currentPaper.totalQuestions || 0) === 0) {
-            alert('This paper does not have any questions yet. Please check back later.');
-            return;
-        }
-
-        document.getElementById('inst-paper-title').textContent = currentPaper.title;
-        document.getElementById('inst-questions').textContent = currentPaper.totalQuestions || 0;
-        document.getElementById('inst-marks').textContent = currentPaper.totalMarks || 0;
-        document.getElementById('inst-duration').textContent = currentPaper.duration || 60;
-
+    // ====== CONFIGURE TEST (marks & duration) ======
+    function showConfigureScreen(paper) {
+        currentPaper = paper;
         selectionScreen.style.display = 'none';
         instructionsScreen.style.display = 'block';
         window.scrollTo(0, 0);
-    };
 
-    window.showSelectionScreen = function() {
-        clearInterval(timerInterval);
-        testSubmitted = false;
-        userAnswers = {};
-        currentQuestionIndex = 0;
-        tabSwitchCount = 0;
-        questions = [];
-        currentPaper = null;
+        document.getElementById('inst-paper-title').textContent = paper.title;
+        document.getElementById('inst-paper-subject').textContent = paper.subject || '';
+        document.getElementById('inst-paper-dept').textContent = paper.department || '';
+        document.getElementById('inst-paper-sem').textContent = paper.semester || '';
+        document.getElementById('inst-paper-pdfs').textContent = ((paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0)) + ' PYQ PDF(s)';
 
-        instructionsScreen.style.display = 'none';
-        testScreen.style.display = 'none';
-        resultsScreen.style.display = 'none';
-        selectionScreen.style.display = 'block';
-        mainHeader.style.display = '';
-        mainFooter.style.display = '';
-        mainContent.style.padding = '';
+        // Reset inputs
+        document.getElementById('test-marks').value = '30';
+        document.getElementById('test-duration').value = '60';
 
-        document.body.style.overflow = '';
-        blurOverlay.style.display = 'none';
-        tabWarningOverlay.style.display = 'none';
+        // Update button handler
+        const startBtn = document.getElementById('start-test-btn');
+        startBtn.onclick = () => generateAndStartTest();
+    }
 
-        removeAntiCheatListeners();
-        loadPapers();
-        loadPastResults();
-    };
+    // ====== GENERATE & START TEST ======
+    async function generateAndStartTest() {
+        const marks = Number(document.getElementById('test-marks').value) || 30;
+        const duration = Number(document.getElementById('test-duration').value) || 60;
+        const btn = document.getElementById('start-test-btn');
 
-    // ========== START TEST ==========
-    window.startTest = async function() {
-        if (!currentPaper) return;
-
-        document.getElementById('start-test-btn').disabled = true;
-        document.getElementById('start-test-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Questions with AI...';
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/questions`, {
-                headers: { 'Authorization': 'Bearer ' + token }
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/start`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ marks, duration })
             });
-            if (!res.ok) throw new Error('Failed to load questions');
             const data = await res.json();
-            questions = data.questions || [];
 
-            if (questions.length === 0) {
-                alert('No questions available for this paper yet.');
-                document.getElementById('start-test-btn').disabled = false;
-                document.getElementById('start-test-btn').innerHTML = '<i class="fas fa-play"></i> Start Test';
+            if (!res.ok) {
+                alert(data.error || 'Failed to generate questions. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
                 return;
             }
 
+            testId = data.testId;
+            questions = data.questions;
+            secondsLeft = data.duration * 60;
+
+            // Update test header
+            document.getElementById('test-paper-title').textContent = data.paper.title;
+            document.getElementById('test-timer').textContent = formatTime(secondsLeft);
+            document.getElementById('test-progress').textContent = `Question 1 of ${questions.length}`;
+
+            // Build nav grid
+            const navGrid = document.getElementById('question-nav-grid');
+            navGrid.innerHTML = questions.map((_, i) =>
+                `<button class="q-nav-btn ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="window.goToQuestion(${i})">${i + 1}</button>`
+            ).join('');
+
+            // Show test screen
             instructionsScreen.style.display = 'none';
             testScreen.style.display = 'block';
-            mainHeader.style.display = 'none';
-            mainFooter.style.display = 'none';
-            mainContent.style.padding = '0';
             document.body.style.overflow = 'hidden';
+            testActive = true;
+            blurCount = 0;
 
-            document.getElementById('test-paper-title').textContent = currentPaper.title;
-            timeRemaining = (currentPaper.duration || 60) * 60;
-            testSubmitted = false;
-            userAnswers = {};
-            currentQuestionIndex = 0;
-            tabSwitchCount = 0;
+            // Start timer
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                const timerEl = document.getElementById('test-timer');
+                timerEl.textContent = formatTime(secondsLeft);
+                if (secondsLeft <= 300) timerEl.classList.add('warning');
+                if (secondsLeft <= 60) timerEl.classList.add('danger');
+                if (secondsLeft <= 0) { clearInterval(timerInterval); submitTest(); }
+            }, 1000);
 
-            buildQuestionNav();
-            showQuestion(0);
-            startTimer();
-            setupAntiCheat();
+            renderQuestion(0);
+            attachAntiCheat();
 
-            // Attempt fullscreen
-            requestFullscreen();
         } catch (err) {
             console.error(err);
-            alert('Failed to start test. Please try again.');
-            document.getElementById('start-test-btn').disabled = false;
-            document.getElementById('start-test-btn').innerHTML = '<i class="fas fa-play"></i> Start Test';
+            alert('Server error. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
         }
-    };
-
-    // ========== QUESTION NAVIGATION ==========
-    function buildQuestionNav() {
-        const grid = document.getElementById('question-nav-grid');
-        grid.innerHTML = questions.map((_, i) => `
-            <button class="q-nav-btn" id="q-nav-${i}" onclick="window.jumpToQuestion(${i})">${i + 1}</button>
-        `).join('');
     }
 
-    function updateQuestionNav() {
-        questions.forEach((_, i) => {
-            const btn = document.getElementById(`q-nav-${i}`);
-            if (!btn) return;
-            btn.className = 'q-nav-btn';
-            if (i === currentQuestionIndex) btn.classList.add('current');
-            const qId = questions[i]._id;
-            if (userAnswers[qId] !== undefined) btn.classList.add('answered');
-        });
-    }
-
-    function showQuestion(index) {
-        if (index < 0 || index >= questions.length) return;
+    // ====== RENDER QUESTION ======
+    function renderQuestion(index) {
         currentQuestionIndex = index;
-
         const q = questions[index];
         document.getElementById('q-number').textContent = `Question ${index + 1} of ${questions.length}`;
         document.getElementById('q-text').textContent = q.question;
         document.getElementById('test-progress').textContent = `Question ${index + 1} of ${questions.length}`;
 
         const optionsContainer = document.getElementById('q-options');
-        optionsContainer.innerHTML = q.options.map((opt, optIdx) => `
-            <label class="option-item ${userAnswers[q._id] === optIdx ? 'selected' : ''}" onclick="window.selectOption('${q._id}', ${optIdx})">
-                <input type="radio" name="q-${q._id}" value="${optIdx}" ${userAnswers[q._id] === optIdx ? 'checked' : ''}>
+        optionsContainer.innerHTML = q.options.map((opt, i) => `
+            <label class="option-item ${answers[index] === i ? 'selected' : ''}" onclick="window.selectOption(${index}, ${i})">
+                <input type="radio" name="q${index}" value="${i}" ${answers[index] === i ? 'checked' : ''}>
                 <span>${escapeHtml(opt)}</span>
             </label>
         `).join('');
@@ -237,66 +198,39 @@ document.addEventListener('DOMContentLoaded', () => {
             ? 'Submit <i class="fas fa-check-circle"></i>'
             : 'Next <i class="fas fa-chevron-right"></i>';
 
-        updateQuestionNav();
+        // Update nav
+        document.querySelectorAll('.q-nav-btn').forEach(btn => {
+            btn.classList.remove('active', 'current');
+            const btnIndex = parseInt(btn.dataset.index);
+            if (btnIndex === index) btn.classList.add('active', 'current');
+            if (answers[btnIndex] !== undefined) btn.classList.add('answered');
+        });
     }
 
-    window.selectOption = function(questionId, optionIndex) {
-        userAnswers[questionId] = optionIndex;
-        // Re-render to show selected state
-        const options = document.querySelectorAll('.option-item');
-        options.forEach((el, i) => {
-            el.classList.toggle('selected', i === optionIndex);
-            const radio = el.querySelector('input[type="radio"]');
-            if (radio) radio.checked = (i === optionIndex);
-        });
-        updateQuestionNav();
+    // ====== NAVIGATION ======
+    window.goToQuestion = function(index) {
+        if (index >= 0 && index < questions.length) renderQuestion(index);
     };
 
-    window.jumpToQuestion = function(index) {
-        showQuestion(index);
+    window.selectOption = function(qIndex, optionIndex) {
+        answers[qIndex] = optionIndex;
+        renderQuestion(qIndex);
+    };
+
+    window.prevQuestion = function() {
+        if (currentQuestionIndex > 0) renderQuestion(currentQuestionIndex - 1);
     };
 
     window.nextQuestion = function() {
         if (currentQuestionIndex < questions.length - 1) {
-            showQuestion(currentQuestionIndex + 1);
+            renderQuestion(currentQuestionIndex + 1);
         } else {
             confirmSubmit();
         }
     };
 
-    window.prevQuestion = function() {
-        if (currentQuestionIndex > 0) {
-            showQuestion(currentQuestionIndex - 1);
-        }
-    };
-
-    // ========== TIMER ==========
-    function startTimer() {
-        clearInterval(timerInterval);
-        updateTimerDisplay();
-        timerInterval = setInterval(() => {
-            timeRemaining--;
-            updateTimerDisplay();
-            if (timeRemaining <= 0) {
-                clearInterval(timerInterval);
-                autoSubmitTest();
-            }
-        }, 1000);
-    }
-
-    function updateTimerDisplay() {
-        const mins = Math.floor(timeRemaining / 60);
-        const secs = timeRemaining % 60;
-        const el = document.getElementById('test-timer');
-        el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        el.classList.remove('warning', 'danger');
-        if (timeRemaining <= 60) el.classList.add('danger');
-        else if (timeRemaining <= 300) el.classList.add('warning');
-    }
-
-    // ========== SUBMIT TEST ==========
     window.confirmSubmit = function() {
-        const answered = Object.keys(userAnswers).length;
+        const answered = Object.keys(answers).length;
         const total = questions.length;
         if (answered < total) {
             if (!confirm(`You have answered ${answered} of ${total} questions. Are you sure you want to submit?`)) return;
@@ -306,24 +240,18 @@ document.addEventListener('DOMContentLoaded', () => {
         submitTest();
     };
 
-    function autoSubmitTest() {
-        alert('Time is up! Your test is being submitted automatically.');
-        submitTest();
-    }
-
+    // ====== SUBMIT TEST ======
     async function submitTest() {
-        if (testSubmitted) return;
-        testSubmitted = true;
+        if (!testActive) return;
+        testActive = false;
         clearInterval(timerInterval);
-        removeAntiCheatListeners();
-        exitFullscreen();
+        detachAntiCheat();
 
-        const answers = Object.entries(userAnswers).map(([questionId, selectedOption]) => ({
-            questionId,
-            selectedOption
+        const timeTaken = Math.round((currentPaper.duration || 60) * 60 - secondsLeft);
+        const formattedAnswers = Object.entries(answers).map(([qId, opt]) => ({
+            questionId: parseInt(qId),
+            selectedOption: opt
         }));
-
-        const timeTaken = ((currentPaper.duration || 60) * 60) - timeRemaining;
 
         try {
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/submit`, {
@@ -332,87 +260,88 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Authorization': 'Bearer ' + token,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ answers, timeTaken })
+                body: JSON.stringify({
+                    testId,
+                    answers: formattedAnswers,
+                    timeTaken
+                })
             });
-            const result = await res.json();
-            testResult = result;
-            showResults(result);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Submit failed');
+            showResults(data);
         } catch (err) {
-            console.error(err);
-            alert('Failed to submit test. Please try again.');
-            testSubmitted = false;
+            alert('Error submitting test: ' + err.message);
+            showSelectionScreen();
         }
     }
 
-    // ========== SHOW RESULTS ==========
-    function showResults(result) {
+    // ====== SHOW RESULTS ======
+    function showResults(data) {
         testScreen.style.display = 'none';
-        resultsScreen.style.display = 'block';
-        mainHeader.style.display = '';
-        mainFooter.style.display = '';
-        mainContent.style.padding = '';
         document.body.style.overflow = '';
+        resultsScreen.style.display = 'block';
+        window.scrollTo(0, 0);
 
         document.getElementById('result-paper-title').textContent = currentPaper.title;
-        document.getElementById('score-value').textContent = result.percentage + '%';
-        document.getElementById('score-circle').style.setProperty('--score-deg', (result.percentage / 100 * 360) + 'deg');
-        document.getElementById('stat-correct').textContent = result.correctCount;
-        document.getElementById('stat-wrong').textContent = result.wrongCount;
-        document.getElementById('stat-unanswered').textContent = result.unansweredCount;
-        document.getElementById('stat-score').textContent = result.score + '/' + result.totalMarks;
+        document.getElementById('score-value').textContent = data.percentage + '%';
+        document.getElementById('score-circle').style.setProperty('--score-deg', (data.percentage * 3.6) + 'deg');
+        document.getElementById('stat-correct').textContent = data.correctCount;
+        document.getElementById('stat-wrong').textContent = data.wrongCount;
+        document.getElementById('stat-unanswered').textContent = data.unansweredCount;
+        document.getElementById('stat-score').textContent = data.score;
 
-        const detailedContainer = document.getElementById('detailed-results');
-        detailedContainer.innerHTML = result.detailedResults.map((r, i) => {
-            let statusClass = 'unanswered';
-            let statusText = 'Not Answered';
-            if (r.isCorrect) { statusClass = 'correct'; statusText = 'Correct'; }
-            else if (r.selectedOption !== undefined && r.selectedOption !== null) { statusClass = 'wrong'; statusText = 'Wrong'; }
-
+        const container = document.getElementById('detailed-results');
+        container.innerHTML = data.detailedResults.map((r, i) => {
+            const status = r.isCorrect ? 'correct' : (r.selectedOption === undefined || r.selectedOption === null ? 'unanswered' : 'wrong');
+            const statusText = r.isCorrect ? 'Correct' : (r.selectedOption === undefined || r.selectedOption === null ? 'Unanswered' : 'Wrong');
             return `
-                <div class="result-question">
-                    <div class="result-question-header">
-                        <div><strong>Q${i + 1}.</strong> <span style="color: var(--text-muted); font-size: 0.85rem;">${escapeHtml(r.question.substring(0, 80))}${r.question.length > 80 ? '...' : ''}</span></div>
-                        <span class="result-status ${statusClass}">${statusText}</span>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        ${r.options.map((opt, idx) => {
-                            let cls = '';
-                            if (idx === r.correctAnswer) cls = 'correct-ans';
-                            else if (idx === r.selectedOption && idx !== r.correctAnswer) cls = 'wrong-ans';
-                            const selectedIcon = idx === r.selectedOption ? '<i class="fas fa-check-circle"></i>' : '';
-                            const correctIcon = idx === r.correctAnswer ? '<i class="fas fa-check"></i>' : '';
-                            return `<div class="result-option ${cls}">${selectedIcon || correctIcon || '<i class="far fa-circle" style="opacity:0.3"></i>'} ${escapeHtml(opt)}</div>`;
-                        }).join('')}
-                    </div>
-                    <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
-                        Marks: ${r.isCorrect ? '+' + r.marks : '0'} / ${r.marks}
-                    </div>
+            <div class="result-question">
+                <div class="result-question-header">
+                    <strong>Q${i + 1}.</strong> ${escapeHtml(r.question)}
+                    <span class="result-status ${status}">${statusText}</span>
                 </div>
+                <div style="margin-bottom: 8px;">
+                    ${r.options.map((opt, idx) => {
+                        let cls = '';
+                        if (idx === r.correctAnswer) cls = 'correct-ans';
+                        else if (idx === r.selectedOption && !r.isCorrect) cls = 'wrong-ans';
+                        return `<div class="result-option ${cls}">${String.fromCharCode(65 + idx)}. ${escapeHtml(opt)}</div>`;
+                    }).join('')}
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    Marks: ${r.isCorrect ? '+' + r.marks : '0'} / ${r.marks}
+                </div>
+            </div>
             `;
         }).join('');
-
-        loadPastResults();
     }
 
+    // ====== SCREEN MANAGEMENT ======
+    window.showSelectionScreen = function() {
+        selectionScreen.style.display = 'block';
+        instructionsScreen.style.display = 'none';
+        testScreen.style.display = 'none';
+        resultsScreen.style.display = 'none';
+        document.body.style.overflow = '';
+        testActive = false;
+        clearInterval(timerInterval);
+        detachAntiCheat();
+        answers = {};
+        questions = [];
+        testId = null;
+        currentQuestionIndex = 0;
+        fetchPapers();
+    };
+
+    window.showInstructions = function(paperId) {
+        // Legacy handler - redirect to configure screen
+        const paper = papers.find(p => p._id === paperId);
+        if (paper) showConfigureScreen(paper);
+    };
+
     window.downloadResult = function() {
-        if (!testResult || !currentPaper) return;
-        const text = `
-StudyHelp 24x7 - Mock Test Result
-=================================
-Paper: ${currentPaper.title}
-Subject: ${currentPaper.subject}
-Department: ${currentPaper.department}
-Date: ${new Date().toLocaleString()}
-
-Score: ${testResult.score} / ${testResult.totalMarks}
-Percentage: ${testResult.percentage}%
-Correct: ${testResult.correctCount}
-Wrong: ${testResult.wrongCount}
-Unanswered: ${testResult.unansweredCount}
-
-Good luck with your exams!
-        `.trim();
-        const blob = new Blob([text], { type: 'text/plain' });
+        const content = document.getElementById('results-screen').innerText;
+        const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -421,170 +350,104 @@ Good luck with your exams!
         URL.revokeObjectURL(url);
     };
 
-    // ========== PAST RESULTS ==========
-    async function loadPastResults() {
+    // ====== ANTI-CHEAT ======
+    function attachAntiCheat() {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+    }
+
+    function detachAntiCheat() {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }
+
+    function handleVisibilityChange() {
+        if (!testActive) return;
+        if (document.hidden) {
+            blurCount++;
+            if (blurCount >= MAX_BLUR) {
+                tabWarningOverlay.style.display = 'flex';
+                setTimeout(() => submitTest(), 2000);
+            } else {
+                blurOverlay.style.display = 'flex';
+            }
+        } else {
+            blurOverlay.style.display = 'none';
+        }
+    }
+
+    function handleFullscreenChange() {
+        if (!testActive) return;
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        }
+    }
+
+    // ====== UTILS ======
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ====== PAST RESULTS ======
+    async function fetchPastResults() {
         const list = document.getElementById('past-results-list');
         try {
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/results`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-            if (!res.ok) throw new Error('Failed to load results');
+            if (!res.ok) throw new Error('Failed');
             const results = await res.json();
 
-            if (results.length === 0) {
-                document.getElementById('past-results-section').style.display = 'none';
+            if (!results.length) {
+                list.innerHTML = '<p class="text-muted" style="text-align: center; padding: 30px;">No past results yet. Take a test to see your results here!</p>';
                 return;
             }
-            document.getElementById('past-results-section').style.display = 'block';
 
             list.innerHTML = results.map(r => {
                 const paper = r.paperId || {};
-                const pct = ((r.score / (r.totalMarks || 1)) * 100).toFixed(1);
+                const date = new Date(r.completedAt).toLocaleDateString();
+                const percentage = r.totalMarks > 0 ? ((r.score / r.totalMarks) * 100).toFixed(1) : 0;
                 return `
-                    <div style="background: white; border-radius: var(--border-radius); padding: 16px 20px; border: 1px solid #E2E8F0; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #E2E8F0; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <div>
-                            <div style="font-weight: 700; color: var(--text-dark);">${escapeHtml(paper.title || 'Unknown Paper')}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(paper.subject || '')} &bull; ${escapeHtml(paper.department || '')} &bull; ${new Date(r.completedAt).toLocaleDateString()}</div>
+                            <div style="font-weight: 700; color: var(--text-dark);">${escapeHtml(paper.title || 'Unknown')}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(paper.subject || '')} · ${date}</div>
                         </div>
                         <div style="text-align: right;">
-                            <div style="font-weight: 700; font-size: 1.2rem; color: ${pct >= 60 ? '#22c55e' : pct >= 40 ? '#f59e0b' : '#dc2626'};">${pct}%</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${r.score}/${r.totalMarks} &bull; ${Math.floor(r.timeTaken / 60)}m ${r.timeTaken % 60}s</div>
+                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">${percentage}%</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">${r.score}/${r.totalMarks} marks</div>
                         </div>
                     </div>
+                    <div style="display: flex; gap: 15px; font-size: 0.85rem;">
+                        <span style="color: #22c55e;"><i class="fas fa-check-circle"></i> ${r.correctCount} Correct</span>
+                        <span style="color: #dc2626;"><i class="fas fa-times-circle"></i> ${r.wrongCount} Wrong</span>
+                        <span style="color: #6b7280;"><i class="fas fa-minus-circle"></i> ${r.unansweredCount} Unanswered</span>
+                    </div>
+                </div>
                 `;
             }).join('');
         } catch (err) {
-            console.error(err);
-            document.getElementById('past-results-section').style.display = 'none';
+            list.innerHTML = '<p class="text-muted" style="text-align: center; padding: 30px;">Could not load past results.</p>';
         }
     }
 
-    // ========== ANTI-CHEAT ==========
-    let antiCheatListeners = [];
-
-    function setupAntiCheat() {
-        // Prevent right-click
-        const contextMenuHandler = (e) => {
-            if (testScreen.style.display === 'block') {
-                e.preventDefault();
-                return false;
-            }
-        };
-        document.addEventListener('contextmenu', contextMenuHandler);
-        antiCheatListeners.push(['contextmenu', contextMenuHandler, document]);
-
-        // Prevent keyboard shortcuts
-        const keydownHandler = (e) => {
-            if (testScreen.style.display !== 'block') return;
-
-            // Prevent copy/paste/cut
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || e.key === 'x' || e.key === 'X')) {
-                e.preventDefault();
-                return false;
-            }
-            // Prevent print
-            if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
-                e.preventDefault();
-                return false;
-            }
-            // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'u')) {
-                e.preventDefault();
-                return false;
-            }
-            // Prevent Alt+Tab detection (best effort - not 100% reliable)
-            if (e.key === 'Alt') {
-                e.preventDefault();
-            }
-        };
-        document.addEventListener('keydown', keydownHandler);
-        antiCheatListeners.push(['keydown', keydownHandler, document]);
-
-        // Prevent copy via selection
-        const copyHandler = (e) => {
-            if (testScreen.style.display === 'block') {
-                e.preventDefault();
-                return false;
-            }
-        };
-        document.addEventListener('copy', copyHandler);
-        antiCheatListeners.push(['copy', copyHandler, document]);
-
-        document.addEventListener('cut', copyHandler);
-        antiCheatListeners.push(['cut', copyHandler, document]);
-
-        // Blur on focus loss
-        const visibilityHandler = () => {
-            if (testScreen.style.display !== 'block' || testSubmitted) return;
-            if (document.hidden) {
-                tabSwitchCount++;
-                if (tabSwitchCount >= MAX_TAB_SWITCHES) {
-                    showTabWarning();
-                    submitTest();
-                } else {
-                    blurOverlay.style.display = 'flex';
-                }
-            } else {
-                blurOverlay.style.display = 'none';
-            }
-        };
-        document.addEventListener('visibilitychange', visibilityHandler);
-        antiCheatListeners.push(['visibilitychange', visibilityHandler, document]);
-
-        // Prevent window resize (possible multi-monitor setup)
-        const resizeHandler = () => {
-            if (testScreen.style.display === 'block' && !testSubmitted) {
-                requestFullscreen();
-            }
-        };
-        window.addEventListener('resize', resizeHandler);
-        antiCheatListeners.push(['resize', resizeHandler, window]);
-
-        // Prevent print screen via keyup
-        const keyupHandler = (e) => {
-            if (e.key === 'PrintScreen') {
-                navigator.clipboard.writeText('Screenshots are not allowed during the test.');
-            }
-        };
-        document.addEventListener('keyup', keyupHandler);
-        antiCheatListeners.push(['keyup', keyupHandler, document]);
-    }
-
-    function removeAntiCheatListeners() {
-        antiCheatListeners.forEach(([event, handler, target]) => {
-            target.removeEventListener(event, handler);
-        });
-        antiCheatListeners = [];
-    }
-
-    function showTabWarning() {
-        tabWarningOverlay.style.display = 'flex';
-        testScreen.style.display = 'none';
-        blurOverlay.style.display = 'none';
-    }
-
-    function requestFullscreen() {
-        const el = document.documentElement;
-        if (el.requestFullscreen) el.requestFullscreen();
-        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-        else if (el.msRequestFullscreen) el.msRequestFullscreen();
-    }
-
-    function exitFullscreen() {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
-    }
-
-    // ========== UTILS ==========
-    function escapeHtml(str) {
-        if (!str) return '';
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
-    // ========== INIT ==========
-    loadPapers();
-    loadPastResults();
-});
+    // ====== INIT ======
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        fetchPapers();
+        fetchPastResults();
+    });
+})();
