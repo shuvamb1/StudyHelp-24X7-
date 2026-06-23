@@ -518,6 +518,7 @@
 
             <div class="glass-card animated delay-2">
                 <h2 class="section-header"><i class="fas fa-brain"></i> AI Mock Test Training</h2>
+                <div id="aiStatusBanner"></div>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
                     <i class="fas fa-magic" style="color: var(--accent-color);"></i>
                     Upload a Previous Year Question (PYQ) PDF and our AI will automatically scan it, extract questions, and generate similar multiple-choice questions for students to practice.
@@ -1126,7 +1127,38 @@
                 msg.style.background = isError ? '#fee2e2' : '#d1fae5';
                 msg.textContent = message;
                 msg.style.display = 'block';
-                setTimeout(() => msg.style.display = 'none', 3000);
+                setTimeout(() => msg.style.display = 'none', 5000);
+            };
+
+            // AI status check
+            let aiStatus = { aiEnabled: false, hasFallback: true };
+            const checkAIStatus = async () => {
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/ai-status`, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (res.ok) aiStatus = await res.json();
+                } catch (err) { /* ignore */ }
+
+                const aiBanner = document.getElementById('aiStatusBanner');
+                if (aiBanner) {
+                    if (!aiStatus.aiEnabled) {
+                        aiBanner.innerHTML = `
+                            <div style="background: #e0f2fe; border: 1px solid #0ea5e9; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; color: #0369a1; font-size: 0.85rem;">
+                                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                                <strong>Free question generator active.</strong> No API key is set, so questions will be generated using the built-in text analyzer (free, no API needed). Results are basic but functional. For higher-quality AI-generated questions, add a free API key from 
+                                <a href="https://console.groq.com/keys" target="_blank" style="color: #0369a1; text-decoration: underline; font-weight: 600;">Groq</a> (free, 14M tokens/day) — set <code>AI_API_KEY</code> and <code>AI_API_BASE=https://api.groq.com/openai/v1</code> in your environment variables.
+                            </div>
+                        `;
+                    } else {
+                        aiBanner.innerHTML = `
+                            <div style="background: #d1fae5; border: 1px solid #22c55e; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; color: #166534; font-size: 0.85rem;">
+                                <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                                <strong>AI provider connected.</strong> Questions will be generated using your configured AI (${aiStatus.model || 'unknown model'}). If AI fails, the free text analyzer will automatically take over.
+                            </div>
+                        `;
+                    }
+                }
             };
 
             const fetchMockTests = async () => {
@@ -1145,9 +1177,9 @@
 
                     list.innerHTML = papers.map(p => {
                         const hasQuestions = (p.totalQuestions || 0) > 0;
-                        const aiStatus = hasQuestions
-                            ? '<span style="color: #059669; font-size: 0.8rem;"><i class="fas fa-check-circle"></i> AI Ready</span>'
-                            : '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-clock"></i> AI Generating...</span>';
+                        const genStatus = hasQuestions
+                            ? '<span style="color: #059669; font-size: 0.8rem;"><i class="fas fa-check-circle"></i> Ready</span>'
+                            : '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-cog fa-spin"></i> Generating...</span>';
                         return `
                         <div class="admin-material-item" id="mocktest-${p._id}">
                             <div>
@@ -1159,12 +1191,12 @@
                                     <span><strong>Questions:</strong> ${p.totalQuestions || 0}</span>
                                     <span><strong>Marks:</strong> ${p.totalMarks || 0}</span>
                                     <span><strong>Duration:</strong> ${p.duration || 60} min</span>
-                                    <span>${aiStatus}</span>
+                                    <span>${genStatus}</span>
                                 </div>
                             </div>
                             <div class="pending-actions" style="margin-top: 0; flex-wrap: wrap;">
                                 ${p.pdfUrl ? `<a href="${p.pdfUrl}" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF</a>` : ''}
-                                <button onclick="regenerateAI('${p._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" title="Regenerate questions with AI"><i class="fas fa-magic"></i> AI Regen</button>
+                                <button onclick="regenerateAI('${p._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" title="Regenerate questions from PDF"><i class="fas fa-magic"></i> Regen</button>
                                 <button onclick="deleteMockTest('${p._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
@@ -1176,11 +1208,11 @@
             };
 
             window.regenerateAI = async (id) => {
-                if (!confirm('This will delete all existing questions and regenerate them with AI using the uploaded PDF. Continue?')) return;
+                if (!confirm('This will delete all existing questions and regenerate them from the PDF. Continue?')) return;
                 const btn = document.querySelector(`#mocktest-${id} .btn-primary`);
                 if (btn) {
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Working...';
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
                 }
                 try {
                     const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/${id}/generate`, {
@@ -1189,20 +1221,21 @@
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        showMockTestsMsg(data.message || 'AI questions generated successfully!');
+                        const source = data.usedAI ? 'AI' : 'Free Analyzer';
+                        showMockTestsMsg(`${source}: ${data.message || 'Questions generated successfully!'}`);
                         fetchMockTests();
                     } else {
-                        showMockTestsMsg(data.error || 'AI generation failed.', true);
+                        showMockTestsMsg(data.error || 'Generation failed.', true);
                         if (btn) {
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-magic"></i> AI Regen';
+                            btn.innerHTML = '<i class="fas fa-magic"></i> Regen';
                         }
                     }
                 } catch (err) {
-                    showMockTestsMsg('Server error during AI generation.', true);
+                    showMockTestsMsg('Server error during generation.', true);
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-magic"></i> AI Regen';
+                        btn.innerHTML = '<i class="fas fa-magic"></i> Regen';
                     }
                 }
             };
@@ -1394,6 +1427,7 @@
             fetchPending();
             fetchAdminMaterials();
             fetchMockTests();
+            checkAIStatus();
         });
     </script>
 </body>
