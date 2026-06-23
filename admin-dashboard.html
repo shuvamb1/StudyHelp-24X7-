@@ -517,26 +517,25 @@
             </div>
 
             <div class="glass-card animated delay-2">
-                <h2 class="section-header"><i class="fas fa-brain"></i> AI Mock Test Training</h2>
-                <div id="aiStatusBanner"></div>
+                <h2 class="section-header"><i class="fas fa-file-alt"></i> Step 1: Create Paper</h2>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
-                    <i class="fas fa-magic" style="color: var(--accent-color);"></i>
-                    Upload a Previous Year Question (PYQ) PDF and our AI will automatically scan it, extract questions, and generate similar multiple-choice questions for students to practice.
+                    <i class="fas fa-info-circle" style="color: var(--accent-color);"></i>
+                    Create a mock test paper first. Set the total marks and time limit. Then upload PYQ PDFs and generate questions.
                 </p>
-                <div id="aiTrainMsg" style="display:none; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; padding: 10px; border-radius: 6px;"></div>
-                <form id="aiTrainForm" enctype="multipart/form-data">
+                <div id="createPaperMsg" style="display:none; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; padding: 10px; border-radius: 6px;"></div>
+                <form id="createPaperForm">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div class="form-group">
-                            <label class="form-label">Paper Title</label>
-                            <input type="text" id="pyqTitle" class="form-control" placeholder="e.g. DBMS PYQ 2023" required>
+                            <label class="form-label">Paper Title / Name</label>
+                            <input type="text" id="paperTitle" class="form-control" placeholder="e.g. DBMS PYQ 2023" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Subject</label>
-                            <input type="text" id="pyqSubject" class="form-control" placeholder="e.g. Database Management" required>
+                            <input type="text" id="paperSubject" class="form-control" placeholder="e.g. Database Management" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Department</label>
-                            <select id="pyqDepartment" class="form-control" required>
+                            <select id="paperDepartment" class="form-control" required>
                                 <option value="Computer Science">Computer Science</option>
                                 <option value="Microbiology">Microbiology</option>
                                 <option value="Mathematics">Mathematics</option>
@@ -548,7 +547,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Semester</label>
-                            <select id="pyqSemester" class="form-control" required>
+                            <select id="paperSemester" class="form-control" required>
                                 <option value="Semester I">Semester I</option>
                                 <option value="Semester II">Semester II</option>
                                 <option value="Semester III">Semester III</option>
@@ -559,23 +558,48 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Year</label>
-                            <input type="text" id="pyqYear" class="form-control" placeholder="e.g. 2023">
+                            <input type="text" id="paperYear" class="form-control" placeholder="e.g. 2023">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Duration (min)</label>
-                            <input type="number" id="pyqDuration" class="form-control" value="60" min="10" max="180">
+                            <label class="form-label">Total Marks</label>
+                            <input type="number" id="paperTotalMarks" class="form-control" value="30" min="5" max="200" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Duration (minutes)</label>
+                            <input type="number" id="paperDuration" class="form-control" value="60" min="10" max="180" required>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 12px;">
-                        <label class="form-label">Upload PYQ PDF</label>
-                        <input type="file" id="pyqFile" class="form-control" accept=".pdf" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
-                        <i class="fas fa-upload"></i> Upload & AI Generate Questions
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-plus"></i> Create Paper
                     </button>
                 </form>
+            </div>
+
+            <div class="glass-card animated delay-2">
+                <h2 class="section-header"><i class="fas fa-upload"></i> Step 2: Upload PYQ PDFs</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                    <i class="fas fa-file-pdf" style="color: var(--accent-color);"></i>
+                    Select a paper and upload Previous Year Question (PYQ) PDFs. You can upload multiple PDFs for the same paper.
+                </p>
+                <div id="uploadPdfMsg" style="display:none; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; padding: 10px; border-radius: 6px;"></div>
+                <form id="uploadPdfForm" enctype="multipart/form-data">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label">Select Paper</label>
+                        <select id="uploadPaperSelect" class="form-control" required>
+                            <option value="">-- Select a paper --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label">Upload PYQ PDFs (you can select multiple)</label>
+                        <input type="file" id="pdfFiles" class="form-control" accept=".pdf" multiple required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                        <i class="fas fa-upload"></i> Upload PDFs
+                    </button>
+                </form>
+                <div id="aiStatusBanner"></div>
                 <button class="btn btn-outline" style="width: 100%;" onclick="showAddQuestionsModal()">
-                    <i class="fas fa-plus-circle"></i> Add Questions Manually (Fallback)
+                    <i class="fas fa-pen"></i> Add Questions Manually (if AI fails)
                 </button>
             </div>
 
@@ -1129,9 +1153,25 @@
                 msg.style.display = 'block';
                 setTimeout(() => msg.style.display = 'none', 5000);
             };
+            const showCreatePaperMsg = (message, isError = false) => {
+                const msg = document.getElementById('createPaperMsg');
+                msg.style.color = isError ? '#dc2626' : '#059669';
+                msg.style.background = isError ? '#fee2e2' : '#d1fae5';
+                msg.textContent = message;
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 5000);
+            };
+            const showUploadPdfMsg = (message, isError = false) => {
+                const msg = document.getElementById('uploadPdfMsg');
+                msg.style.color = isError ? '#dc2626' : '#059669';
+                msg.style.background = isError ? '#fee2e2' : '#d1fae5';
+                msg.textContent = message;
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 5000);
+            };
 
             // AI status check
-            let aiStatus = { aiEnabled: false, hasFallback: true };
+            let aiStatus = { aiEnabled: false };
             const checkAIStatus = async () => {
                 try {
                     const res = await fetch(`${API_BASE_URL}/api/admin/ai-status`, {
@@ -1144,20 +1184,36 @@
                 if (aiBanner) {
                     if (!aiStatus.aiEnabled) {
                         aiBanner.innerHTML = `
-                            <div style="background: #e0f2fe; border: 1px solid #0ea5e9; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; color: #0369a1; font-size: 0.85rem;">
-                                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
-                                <strong>Free question generator active.</strong> No API key is set, so questions will be generated using the built-in text analyzer (free, no API needed). Results are basic but functional. For higher-quality AI-generated questions, add a free API key from 
-                                <a href="https://console.groq.com/keys" target="_blank" style="color: #0369a1; text-decoration: underline; font-weight: 600;">Groq</a> (free, 14M tokens/day) — set <code>AI_API_KEY</code> and <code>AI_API_BASE=https://api.groq.com/openai/v1</code> in your environment variables.
+                            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin-top: 10px; color: #92400e; font-size: 0.85rem;">
+                                <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                                <strong>AI not configured.</strong> Question generation requires an AI API key. Get a free key from 
+                                <a href="https://console.groq.com/keys" target="_blank" style="color: #92400e; text-decoration: underline; font-weight: 600;">Groq</a> (free) and set <code>AI_API_KEY</code> + <code>AI_API_BASE=https://api.groq.com/openai/v1</code> in your environment variables.
                             </div>
                         `;
                     } else {
                         aiBanner.innerHTML = `
-                            <div style="background: #d1fae5; border: 1px solid #22c55e; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; color: #166534; font-size: 0.85rem;">
+                            <div style="background: #d1fae5; border: 1px solid #22c55e; border-radius: 8px; padding: 12px 16px; margin-top: 10px; color: #166534; font-size: 0.85rem;">
                                 <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-                                <strong>AI provider connected.</strong> Questions will be generated using your configured AI (${aiStatus.model || 'unknown model'}). If AI fails, the free text analyzer will automatically take over.
+                                <strong>AI connected (${aiStatus.model || 'unknown'}).</strong> Ready to generate questions from uploaded PDFs.
                             </div>
                         `;
                     }
+                }
+            };
+
+            // Populate paper dropdown for PDF upload
+            const populatePaperSelect = async () => {
+                const select = document.getElementById('uploadPaperSelect');
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests`, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (!res.ok) return;
+                    const papers = await res.json();
+                    select.innerHTML = '<option value="">-- Select a paper --</option>' +
+                        papers.map(p => `<option value="${p._id}">${p.title} (${p.subject}, ${p.totalMarks || 0} marks)</option>`).join('');
+                } catch (err) {
+                    select.innerHTML = '<option value="">Error loading papers</option>';
                 }
             };
 
@@ -1170,33 +1226,40 @@
                     if (!res.ok) throw new Error('Failed to load mock tests');
                     const papers = await res.json();
 
+                    // Also update the paper select dropdown
+                    populatePaperSelect();
+
                     if (!papers.length) {
-                        list.innerHTML = '<p class="text-muted" style="text-align: center; padding: 24px;">No mock test papers uploaded yet.</p>';
+                        list.innerHTML = '<p class="text-muted" style="text-align: center; padding: 24px;">No mock test papers created yet. Create a paper first.</p>';
                         return;
                     }
 
                     list.innerHTML = papers.map(p => {
                         const hasQuestions = (p.totalQuestions || 0) > 0;
-                        const genStatus = hasQuestions
+                        const pdfCount = (p.pdfFiles && p.pdfFiles.length) || (p.pdfUrl ? 1 : 0);
+                        const status = hasQuestions
                             ? '<span style="color: #059669; font-size: 0.8rem;"><i class="fas fa-check-circle"></i> Ready</span>'
-                            : '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-cog fa-spin"></i> Generating...</span>';
+                            : pdfCount > 0
+                                ? '<span style="color: #f59e0b; font-size: 0.8rem;"><i class="fas fa-clock"></i> Needs Generation</span>'
+                                : '<span style="color: #9ca3af; font-size: 0.8rem;"><i class="fas fa-upload"></i> Needs PDFs</span>';
                         return `
                         <div class="admin-material-item" id="mocktest-${p._id}">
-                            <div>
+                            <div style="flex: 1;">
                                 <div class="admin-material-title">${p.title || 'Untitled'}</div>
                                 <div class="admin-material-meta">
                                     <span><strong>Subject:</strong> ${p.subject || 'N/A'}</span>
                                     <span><strong>Dept:</strong> ${p.department || 'N/A'}</span>
                                     <span><strong>Sem:</strong> ${p.semester || 'N/A'}</span>
-                                    <span><strong>Questions:</strong> ${p.totalQuestions || 0}</span>
                                     <span><strong>Marks:</strong> ${p.totalMarks || 0}</span>
                                     <span><strong>Duration:</strong> ${p.duration || 60} min</span>
-                                    <span>${genStatus}</span>
+                                    <span><strong>PDFs:</strong> ${pdfCount}</span>
+                                    <span><strong>Questions:</strong> ${p.totalQuestions || 0}</span>
+                                    <span>${status}</span>
                                 </div>
                             </div>
                             <div class="pending-actions" style="margin-top: 0; flex-wrap: wrap;">
                                 ${p.pdfUrl ? `<a href="${p.pdfUrl}" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF</a>` : ''}
-                                <button onclick="regenerateAI('${p._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" title="Regenerate questions from PDF"><i class="fas fa-magic"></i> Regen</button>
+                                <button onclick="generateQuestions('${p._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" ${pdfCount === 0 ? 'disabled' : ''} title="Generate questions from all PDFs using AI"><i class="fas fa-magic"></i> Generate</button>
                                 <button onclick="deleteMockTest('${p._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
@@ -1207,12 +1270,12 @@
                 }
             };
 
-            window.regenerateAI = async (id) => {
-                if (!confirm('This will delete all existing questions and regenerate them from the PDF. Continue?')) return;
+            window.generateQuestions = async (id) => {
+                if (!confirm('AI will read ALL uploaded PDFs for this paper and generate questions. This may take 10-30 seconds. Continue?')) return;
                 const btn = document.querySelector(`#mocktest-${id} .btn-primary`);
                 if (btn) {
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Working...';
                 }
                 try {
                     const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/${id}/generate`, {
@@ -1221,27 +1284,26 @@
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        const source = data.usedAI ? 'AI' : 'Free Analyzer';
-                        showMockTestsMsg(`${source}: ${data.message || 'Questions generated successfully!'}`);
+                        showMockTestsMsg(data.message || 'AI generated questions successfully!');
                         fetchMockTests();
                     } else {
                         showMockTestsMsg(data.error || 'Generation failed.', true);
                         if (btn) {
                             btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-magic"></i> Regen';
+                            btn.innerHTML = '<i class="fas fa-magic"></i> Generate';
                         }
                     }
                 } catch (err) {
                     showMockTestsMsg('Server error during generation.', true);
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-magic"></i> Regen';
+                        btn.innerHTML = '<i class="fas fa-magic"></i> Generate';
                     }
                 }
             };
 
             window.deleteMockTest = async (id) => {
-                if (!confirm('Delete this mock test paper and all its questions?')) return;
+                if (!confirm('Delete this mock test paper, all its PDFs, and all questions?')) return;
                 try {
                     const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/${id}`, {
                         method: 'DELETE',
@@ -1255,42 +1317,94 @@
                 }
             };
 
-            document.getElementById('aiTrainForm').addEventListener('submit', async (e) => {
+            // Step 1: Create Paper form
+            document.getElementById('createPaperForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/papers`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            title: document.getElementById('paperTitle').value,
+                            subject: document.getElementById('paperSubject').value,
+                            department: document.getElementById('paperDepartment').value,
+                            semester: document.getElementById('paperSemester').value,
+                            year: document.getElementById('paperYear').value,
+                            totalMarks: Number(document.getElementById('paperTotalMarks').value),
+                            duration: Number(document.getElementById('paperDuration').value)
+                        })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showCreatePaperMsg(data.message || 'Paper created successfully!');
+                        e.target.reset();
+                        document.getElementById('paperTotalMarks').value = '30';
+                        document.getElementById('paperDuration').value = '60';
+                        fetchMockTests();
+                    } else {
+                        showCreatePaperMsg(data.error || 'Failed to create paper.', true);
+                    }
+                } catch (err) {
+                    showCreatePaperMsg('Server error.', true);
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> Create Paper';
+            });
+
+            // Step 2: Upload PDFs form
+            document.getElementById('uploadPdfForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = e.target.querySelector('button[type="submit"]');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
+                const paperId = document.getElementById('uploadPaperSelect').value;
+                if (!paperId) {
+                    showUploadPdfMsg('Please select a paper first.', true);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-upload"></i> Upload PDFs';
+                    return;
+                }
+
                 const formData = new FormData();
-                formData.append('title', document.getElementById('pyqTitle').value);
-                formData.append('subject', document.getElementById('pyqSubject').value);
-                formData.append('department', document.getElementById('pyqDepartment').value);
-                formData.append('semester', document.getElementById('pyqSemester').value);
-                formData.append('year', document.getElementById('pyqYear').value);
-                formData.append('duration', document.getElementById('pyqDuration').value);
-                const fileInput = document.getElementById('pyqFile');
-                if (fileInput.files[0]) formData.append('pdf', fileInput.files[0]);
+                const fileInput = document.getElementById('pdfFiles');
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    showUploadPdfMsg('Please select at least one PDF file.', true);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-upload"></i> Upload PDFs';
+                    return;
+                }
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    formData.append('pdfs', fileInput.files[i]);
+                }
 
                 try {
-                    const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/upload`, {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/mock-tests/${paperId}/pdfs`, {
                         method: 'POST',
                         headers: { 'Authorization': 'Bearer ' + token },
                         body: formData
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        showMockTestsMsg(data.message || 'Paper uploaded successfully! AI is generating questions in the background.');
+                        showUploadPdfMsg(data.message || 'PDFs uploaded successfully!');
                         e.target.reset();
-                        document.getElementById('pyqDuration').value = '60';
+                        populatePaperSelect();
                         fetchMockTests();
                     } else {
-                        showMockTestsMsg(data.error || 'Upload failed.', true);
+                        showUploadPdfMsg(data.error || 'Upload failed.', true);
                     }
                 } catch (err) {
-                    showMockTestsMsg('Server error during upload.', true);
+                    showUploadPdfMsg('Server error during upload.', true);
                 }
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-upload"></i> Upload Paper';
+                btn.innerHTML = '<i class="fas fa-upload"></i> Upload PDFs';
             });
 
             // Add Questions Modal
