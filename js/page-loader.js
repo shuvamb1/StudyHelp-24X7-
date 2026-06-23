@@ -5,8 +5,9 @@
     var loader = document.createElement('div');
     loader.id = LOADER_ID;
     loader.innerHTML =
-      '<div class="page-loader-spinner" aria-hidden="true"></div>' +
-      '<p class="page-loader-text">Loading...</p>';
+      '<div class="page-loader-spinner" aria-hidden="true">' +
+      '<img src="assets/images/logo.png" alt="StudyHelp 24x7" class="page-loader-logo">' +
+      '</div>';
     return loader;
   }
 
