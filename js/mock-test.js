@@ -1,749 +1,506 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Mock Test | StudyHelp 24x7</title>
-    <link rel="stylesheet" href="css/loader.css">
-    <script src="js/page-loader.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .mock-container {
-            max-width: 1200px;
-            margin: 120px auto 50px;
-            padding: 0 20px;
-        }
-        .mock-hero {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, rgba(102,0,255,0.08) 0%, rgba(99,102,241,0.06) 100%);
-            border-radius: var(--border-radius-lg);
-            margin-bottom: 40px;
-            border: 1px solid rgba(102,0,255,0.1);
-        }
-        .mock-hero h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .mock-hero p {
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
-        }
+(function() {
+    'use strict';
 
-        .papers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .paper-card {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 24px;
-            border: 1px solid #E2E8F0;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .paper-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            border-color: var(--primary-color);
-        }
-        .paper-card-disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            background: #f8fafc;
-        }
-        .paper-card-disabled:hover {
-            transform: none;
-            box-shadow: none;
-            border-color: #E2E8F0;
-        }
-        .paper-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        .paper-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-dark);
-        }
-        .paper-badge {
-            background: rgba(102,0,255,0.1);
-            color: var(--primary-color);
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .paper-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-        .paper-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .paper-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid #E2E8F0;
-        }
-        .paper-stat {
-            text-align: center;
-        }
-        .paper-stat-value {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--primary-color);
-        }
-        .paper-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
+    const API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000';
+    const token = localStorage.getItem('token');
 
-        /* Instructions Screen */
-        .instructions-screen {
-            display: none;
-            background: white;
-            border-radius: var(--border-radius-lg);
-            padding: 40px;
-            border: 1px solid #E2E8F0;
-        }
-        .instructions-list {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-        .instructions-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        .instructions-list li i {
-            color: var(--primary-color);
-            margin-top: 3px;
-            width: 20px;
-        }
-        .instructions-list li:last-child {
-            border-bottom: none;
-        }
-        .warning-box {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            color: #92400e;
-            font-size: 0.9rem;
-        }
-        .warning-box i {
-            color: #f59e0b;
-            margin-right: 8px;
-        }
+    // Screens
+    const selectionScreen = document.getElementById('selection-screen');
+    const instructionsScreen = document.getElementById('instructions-screen');
+    const testScreen = document.getElementById('test-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const blurOverlay = document.getElementById('blur-overlay');
+    const tabWarningOverlay = document.getElementById('tab-warning-overlay');
 
-        /* Test Screen */
-        .test-screen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #f8fafc;
-            z-index: 9999;
-            overflow: hidden;
-        }
-        .test-header {
-            background: white;
-            border-bottom: 1px solid #E2E8F0;
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 60px;
-        }
-        .test-timer {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            font-family: 'Courier New', monospace;
-            background: rgba(102,0,255,0.08);
-            padding: 6px 16px;
-            border-radius: 8px;
-        }
-        .test-timer.warning { color: #dc2626; background: rgba(220,38,38,0.08); }
-        .test-timer.danger { color: #dc2626; background: rgba(220,38,38,0.15); animation: timer-pulse 1s infinite; }
-        @keyframes timer-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        .test-progress {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        .test-body {
-            display: flex;
-            height: calc(100vh - 60px);
-        }
-        .test-sidebar {
-            width: 280px;
-            background: white;
-            border-right: 1px solid #E2E8F0;
-            padding: 20px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-        .question-nav-title {
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-            color: var(--text-dark);
-        }
-        .question-nav-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .q-nav-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            border: 2px solid #E2E8F0;
-            background: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .q-nav-btn:hover { border-color: var(--primary-color); }
-        .q-nav-btn.active { border-color: var(--primary-color); background: rgba(102,0,255,0.1); color: var(--primary-color); }
-        .q-nav-btn.answered { background: #dcfce7; border-color: #22c55e; color: #15803d; }
-        .q-nav-btn.current { box-shadow: 0 0 0 3px rgba(102,0,255,0.3); }
+    // State
+    let papers = [];
+    let currentPaper = null;
+    let testId = null;
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let answers = {};
+    let timerInterval = null;
+    let secondsLeft = 0;
+    let testActive = false;
+    let blurCount = 0;
+    const MAX_BLUR = 3;
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .legend-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            border: 2px solid #E2E8F0;
-        }
-        .legend-dot.answered { background: #dcfce7; border-color: #22c55e; }
-        .legend-dot.current { background: rgba(102,0,255,0.1); border-color: var(--primary-color); }
-        .legend-dot.unvisited { background: white; border-color: #E2E8F0; }
+    // ====== LOAD PAPERS ======
+    async function fetchPapers() {
+        const loading = document.getElementById('papers-loading');
+        const grid = document.getElementById('papers-grid');
+        const noPapers = document.getElementById('no-papers');
 
-        .test-main {
-            flex: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-        }
-        .question-card {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 30px;
-            border: 1px solid #E2E8F0;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .question-number {
-            font-size: 0.85rem;
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .question-text {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-        .question-text, .question-number {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .option-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 18px;
-            border: 2px solid #E2E8F0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-        .option-item:hover {
-            border-color: var(--primary-color);
-            background: rgba(102,0,255,0.02);
-        }
-        .option-item.selected {
-            border-color: var(--primary-color);
-            background: rgba(102,0,255,0.06);
-        }
-        .option-item input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary-color);
-            flex-shrink: 0;
-        }
-        .question-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #E2E8F0;
-        }
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/papers`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Failed to load');
+            papers = await res.json();
 
-        /* Results Screen */
-        .results-screen {
-            display: none;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .results-header {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: var(--border-radius-lg);
-            border: 1px solid #E2E8F0;
-            margin-bottom: 30px;
-        }
-        .score-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: conic-gradient(var(--primary-color) var(--score-deg), #e2e8f0 0deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto;
-            position: relative;
-        }
-        .score-circle::before {
-            content: '';
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: white;
-        }
-        .score-value {
-            position: relative;
-            z-index: 1;
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary-color);
-        }
-        .score-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 25px;
-        }
-        .stat-card {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .stat-card-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        .stat-card-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        .correct { color: #22c55e; }
-        .wrong { color: #dc2626; }
-        .unanswered { color: #6b7280; }
-        .result-question {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 24px;
-            border: 1px solid #E2E8F0;
-            margin-bottom: 15px;
-        }
-        .result-question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .result-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .result-status.correct { background: #dcfce7; color: #15803d; }
-        .result-status.wrong { background: #fee2e2; color: #b91c1c; }
-        .result-status.unanswered { background: #f3f4f6; color: #6b7280; }
-        .result-option {
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .result-option.correct-ans { background: #dcfce7; border: 1px solid #22c55e; color: #15803d; }
-        .result-option.wrong-ans { background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; }
-        .result-option.selected { font-weight: 600; }
+            loading.style.display = 'none';
+            if (!papers.length) {
+                grid.innerHTML = '';
+                noPapers.style.display = 'block';
+                return;
+            }
+            noPapers.style.display = 'none';
 
-        /* Blur overlay for focus loss */
-        .blur-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        .blur-overlay i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: #f59e0b;
-        }
-        .blur-overlay h2 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        /* Tab switch warning */
-        .tab-warning-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(220,38,38,0.95);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: white;
-            text-align: center;
-            padding: 40px;
-        }
-        .tab-warning-overlay h2 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-        .tab-warning-overlay p {
-            font-size: 1.1rem;
-            max-width: 500px;
-        }
-
-        @media (max-width: 768px) {
-            .test-sidebar { display: none; }
-            .test-main { padding: 20px; }
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .mock-hero h1 { font-size: 1.5rem; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 px-4 pt-3" id="main-header">
-        <div class="container">
-            <nav class="navbar mx-auto max-w-5xl px-4 rounded-2xl transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 border border-transparent bg-transparent">
-                <a href="index.html" class="logo-container">
-                    <img src="assets/images/logo.png" alt="StudyHelp 24x7 Logo" class="logo-img">
-                    <div class="logo-text">
-                        <span class="logo-main">StudyHelp 24x7</span>
-                        <span class="logo-sub">St. Xavier's College</span>
+            grid.innerHTML = papers.map(paper => {
+                const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
+                const hasPDFs = pdfCount > 0;
+                return `
+                <div class="paper-card ${hasPDFs ? '' : 'paper-card-disabled'}">
+                    <div class="paper-card-header">
+                        <div class="paper-title">${escapeHtml(paper.title)}</div>
+                        <span class="paper-badge">${escapeHtml(paper.department)}</span>
                     </div>
-                </a>
-                <button class="mobile-menu-btn" aria-expanded="false">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="materials.html">Study Materials</a></li>
-                    <li><a href="mock-test.html" style="color: var(--accent-color);">Mock Tests</a></li>
-                    <li><a href="contribute.html">Contribute</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li class="mobile-only-actions">
-                        <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; margin-bottom: 10px;">Login</a>
-                        <a href="register.html" class="btn btn-primary" style="width: 100%; text-align: center;">Sign Up</a>
-                    </li>
-                </ul>
-                <div class="nav-actions">
-                    <a href="login.html" class="btn btn-outline">Login</a>
-                    <a href="register.html" class="btn btn-primary">Sign Up</a>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <main class="mock-container" id="main-content">
-        <!-- Paper Selection Screen -->
-        <div id="selection-screen">
-            <div class="mock-hero reveal active">
-                <h1><i class="fas fa-brain"></i> AI-Powered Mock Tests</h1>
-                <p>Practice with Previous Year Question papers. Our AI model learns from PYQs to generate realistic mock tests. Select a paper to begin.</p>
-            </div>
-            <div id="papers-loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
-                Loading available papers...
-            </div>
-            <div id="papers-grid" class="papers-grid"></div>
-            <div id="no-papers" style="display: none; text-align: center; padding: 60px 20px;">
-                <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 15px;"></i>
-                <h3>No papers available yet</h3>
-                <p class="text-muted">Check back later. Admin will upload PYQ papers soon.</p>
-            </div>
-
-            <!-- Past Results -->
-            <div id="past-results-section" style="margin-top: 50px;">
-                <h2 style="margin-bottom: 20px;"><i class="fas fa-chart-bar" style="color: var(--primary-color);"></i> Your Past Results</h2>
-                <div id="past-results-list"></div>
-            </div>
-        </div>
-
-        <!-- Configure Test Screen -->
-        <div class="instructions-screen" id="instructions-screen">
-            <div style="max-width: 700px; margin: 0 auto;">
-                <h2 style="text-align: center; margin-bottom: 10px;"><i class="fas fa-sliders-h" style="color: var(--primary-color);"></i> Configure Your Mock Test</h2>
-                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;" id="inst-paper-title">Paper Title</p>
-
-                <div style="background: #f8fafc; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.9rem; color: var(--text-muted);">
-                        <div><strong>Subject:</strong> <span id="inst-paper-subject">-</span></div>
-                        <div><strong>Department:</strong> <span id="inst-paper-dept">-</span></div>
-                        <div><strong>Semester:</strong> <span id="inst-paper-sem">-</span></div>
-                        <div><strong>PYQs:</strong> <span id="inst-paper-pdfs">-</span></div>
+                    <div class="paper-meta">
+                        <span><i class="fas fa-book"></i> ${escapeHtml(paper.subject)}</span>
+                        <span><i class="fas fa-calendar"></i> ${escapeHtml(paper.semester)}</span>
+                        <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(paper.year || 'N/A')}</span>
+                        <span><i class="fas fa-file-pdf"></i> ${pdfCount} PYQ PDF(s)</span>
                     </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div class="form-group">
-                        <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-dark);">Total Marks</label>
-                        <input type="number" id="test-marks" class="form-control" value="30" min="5" max="200" style="font-size: 1rem;">
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">How many marks worth of questions</p>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-dark);">Duration (minutes)</label>
-                        <input type="number" id="test-duration" class="form-control" value="60" min="5" max="180" style="font-size: 1rem;">
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Time limit for the test</p>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 30px;">
-                    <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-dark);">Question Type</label>
-                    <select id="question-type" class="form-control" style="font-size: 1rem;">
-                        <option value="mcq">Multiple Choice (MCQ)</option>
-                        <option value="descriptive">Descriptive / Long Answer</option>
-                        <option value="mixed">Mixed (MCQ + Descriptive)</option>
-                    </select>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">What type of questions should the AI generate?</p>
-                </div>
-
-                <ul class="instructions-list">
-                    <li><i class="fas fa-check-circle"></i> <span>AI will generate questions based on the uploaded PYQ PDFs. This may take 10-30 seconds.</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span>The test is timed. Once time runs out, your answers will be auto-submitted.</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span>You can navigate between questions using the sidebar or the Next/Previous buttons.</span></li>
-                    <li><i class="fas fa-check-circle"></i> <span>Click "Submit Test" when you are done. Review your answers before submitting.</span></li>
-                </ul>
-
-                <div class="warning-box">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Anti-Cheat Policy:</strong> Switching tabs, minimizing the window, taking screenshots, or copying questions is strictly prohibited. Violations will result in automatic test submission.
-                </div>
-
-                <div style="text-align: center; margin-top: 30px;">
-                    <button class="btn btn-outline" onclick="showSelectionScreen()" style="margin-right: 15px;"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button class="btn btn-primary" id="start-test-btn"><i class="fas fa-magic"></i> Generate & Start Test</button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Test Screen (Fullscreen overlay) -->
-    <div class="test-screen" id="test-screen">
-        <div class="test-header">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span style="font-weight: 700; color: var(--text-dark);" id="test-paper-title">Mock Test</span>
-                <span class="test-progress" id="test-progress">Question 1 of 10</span>
-            </div>
-            <div class="test-timer" id="test-timer">60:00</div>
-            <button class="btn btn-primary" onclick="confirmSubmit()" style="padding: 8px 20px; font-size: 0.85rem;">
-                <i class="fas fa-check-circle"></i> Submit
-            </button>
-        </div>
-        <div class="test-body">
-            <div class="test-sidebar">
-                <div class="question-nav-title">Question Navigator</div>
-                <div class="question-nav-grid" id="question-nav-grid"></div>
-                <div style="margin-bottom: 20px;">
-                    <div class="legend-item"><div class="legend-dot answered"></div> Answered</div>
-                    <div class="legend-item"><div class="legend-dot current"></div> Current</div>
-                    <div class="legend-item"><div class="legend-dot unvisited"></div> Not visited</div>
-                </div>
-                <div style="padding: 15px; background: #f8fafc; border-radius: 10px; font-size: 0.85rem; color: var(--text-muted);">
-                    <i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 5px;"></i>
-                    Use the numbered buttons to jump between questions.
-                </div>
-            </div>
-            <div class="test-main" id="test-main-area">
-                <div class="question-card" id="question-card">
-                    <div class="question-number" id="q-number">Question 1</div>
-                    <div class="question-text" id="q-text">Loading question...</div>
-                    <div class="options-list" id="q-options"></div>
-                    <div class="question-actions">
-                        <button class="btn btn-outline" id="btn-prev" onclick="prevQuestion()">
-                            <i class="fas fa-chevron-left"></i> Previous
-                        </button>
-                        <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">
-                            Next <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Blur Overlay (focus lost) -->
-    <div class="blur-overlay" id="blur-overlay">
-        <i class="fas fa-eye-slash"></i>
-        <h2>Focus Lost Detected</h2>
-        <p>Please return to this window immediately. Tab switching is not allowed during the test.</p>
-    </div>
-
-    <!-- Tab Warning Overlay -->
-    <div class="tab-warning-overlay" id="tab-warning-overlay">
-        <i class="fas fa-ban" style="font-size: 4rem; margin-bottom: 20px;"></i>
-        <h2>Test Terminated</h2>
-        <p>You have violated the anti-cheat policy by switching tabs or minimizing the window. Your test has been submitted automatically.</p>
-    </div>
-
-    <!-- Results Screen (shown in main content) -->
-    <div class="results-screen" id="results-screen">
-        <div class="results-header">
-            <h2><i class="fas fa-trophy" style="color: var(--primary-color);"></i> Test Results</h2>
-            <p style="color: var(--text-muted);" id="result-paper-title">Paper Title</p>
-            <div class="score-circle" id="score-circle">
-                <div class="score-value" id="score-value">0%</div>
-            </div>
-            <div class="score-label">Score Percentage</div>
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-card-value correct" id="stat-correct">0</div>
-                    <div class="stat-card-label">Correct</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-value wrong" id="stat-wrong">0</div>
-                    <div class="stat-card-label">Wrong</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-value unanswered" id="stat-unanswered">0</div>
-                    <div class="stat-card-label">Unanswered</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-value" style="color: var(--primary-color);" id="stat-score">0</div>
-                    <div class="stat-card-label">Total Score</div>
-                </div>
-            </div>
-        </div>
-        <div style="text-align: center; margin-bottom: 30px;">
-            <button class="btn btn-outline" onclick="showSelectionScreen()" style="margin-right: 10px;">
-                <i class="fas fa-arrow-left"></i> Back to Papers
-            </button>
-            <button class="btn btn-primary" onclick="downloadResult()">
-                <i class="fas fa-download"></i> Download Result
-            </button>
-        </div>
-        <h3 style="margin-bottom: 15px;"><i class="fas fa-list-alt" style="color: var(--primary-color);"></i> Detailed Analysis</h3>
-        <div id="detailed-results"></div>
-    </div>
-
-    <!-- Footer -->
-    <footer id="main-footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="logo-container" style="margin-bottom: 20px;">
-                        <img src="assets/images/logo.png" alt="StudyHelp 24x7 Logo" style="height: 40px;">
-                        <div class="logo-text">
-                            <span class="logo-main" style="color: white;">StudyHelp 24x7</span>
+                    <div class="paper-stats">
+                        <div class="paper-stat">
+                            <div class="paper-stat-value">${pdfCount}</div>
+                            <div class="paper-stat-label">PYQs</div>
                         </div>
                     </div>
-                    <p>Empowering students of St. Xavier's College, Kolkata with a 24x7 accessible, premium academic resource hub.</p>
+                    ${hasPDFs ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
                 </div>
-                <div class="footer-col">
-                    <h4>Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="materials.html">Study Materials</a></li>
-                        <li><a href="mock-test.html">Mock Tests</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Support</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html#faq">FAQs</a></li>
-                        <li><a href="https://wa.me/918981109323" target="_blank">WhatsApp Us</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Contact</h4>
-                    <ul class="footer-links">
-                        <li style="color: #CBD5E0; margin-bottom: 12px;"><i class="fas fa-envelope" style="margin-right: 10px; color: var(--accent-color);"></i> shuvambhattacharya896@gmail.com</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                &copy; <span id="current-year"></span> StudyHelp 24x7. All rights reserved.
-            </div>
-        </div>
-    </footer>
+            `;
+            }).join('');
 
-    <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/mock-test.js"></script>
-</body>
-</html>
+            grid.querySelectorAll('.paper-card').forEach((card, index) => {
+                const paper = papers[index];
+                const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
+                if (pdfCount > 0) {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => showConfigureScreen(paper));
+                }
+            });
+        } catch (err) {
+            loading.innerHTML = '<p class="text-danger">Failed to load papers. Please try again.</p>';
+        }
+    }
+
+    // ====== CONFIGURE TEST (marks & duration) ======
+    function showConfigureScreen(paper) {
+        currentPaper = paper;
+        selectionScreen.style.display = 'none';
+        instructionsScreen.style.display = 'block';
+        window.scrollTo(0, 0);
+
+        document.getElementById('inst-paper-title').textContent = paper.title;
+        document.getElementById('inst-paper-subject').textContent = paper.subject || '';
+        document.getElementById('inst-paper-dept').textContent = paper.department || '';
+        document.getElementById('inst-paper-sem').textContent = paper.semester || '';
+        document.getElementById('inst-paper-pdfs').textContent = ((paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0)) + ' PYQ PDF(s)';
+
+        // Reset inputs
+        document.getElementById('test-marks').value = '30';
+        document.getElementById('test-duration').value = '60';
+        document.getElementById('question-type').value = 'mcq';
+
+        // Update button handler
+        const startBtn = document.getElementById('start-test-btn');
+        startBtn.onclick = () => generateAndStartTest();
+    }
+
+    // ====== GENERATE & START TEST ======
+    async function generateAndStartTest() {
+        const marks = Number(document.getElementById('test-marks').value) || 30;
+        const duration = Number(document.getElementById('test-duration').value) || 60;
+        const questionType = document.getElementById('question-type').value || 'mcq';
+        const btn = document.getElementById('start-test-btn');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Questions with AI...';
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/start`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ marks, duration, questionType })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Failed to generate questions. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
+                return;
+            }
+
+            testId = data.testId;
+            questions = data.questions;
+            secondsLeft = data.duration * 60;
+
+            // Update test header
+            document.getElementById('test-paper-title').textContent = data.paper.title;
+            document.getElementById('test-timer').textContent = formatTime(secondsLeft);
+            document.getElementById('test-progress').textContent = `Question 1 of ${questions.length}`;
+
+            // Build nav grid
+            const navGrid = document.getElementById('question-nav-grid');
+            navGrid.innerHTML = questions.map((_, i) =>
+                `<button class="q-nav-btn ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="window.goToQuestion(${i})">${i + 1}</button>`
+            ).join('');
+
+            // Show test screen
+            instructionsScreen.style.display = 'none';
+            testScreen.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            testActive = true;
+            blurCount = 0;
+
+            // Start timer
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                const timerEl = document.getElementById('test-timer');
+                timerEl.textContent = formatTime(secondsLeft);
+                if (secondsLeft <= 300) timerEl.classList.add('warning');
+                if (secondsLeft <= 60) timerEl.classList.add('danger');
+                if (secondsLeft <= 0) { clearInterval(timerInterval); submitTest(); }
+            }, 1000);
+
+            renderQuestion(0);
+            attachAntiCheat();
+
+        } catch (err) {
+            console.error(err);
+            alert('Server error. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
+        }
+    }
+
+    // ====== RENDER QUESTION ======
+    function renderQuestion(index) {
+        currentQuestionIndex = index;
+        const q = questions[index];
+        document.getElementById('q-number').textContent = `Question ${index + 1} of ${questions.length}`;
+        document.getElementById('q-text').textContent = q.question;
+        document.getElementById('test-progress').textContent = `Question ${index + 1} of ${questions.length}`;
+
+        const optionsContainer = document.getElementById('q-options');
+        if (q.type === 'descriptive') {
+            optionsContainer.innerHTML = `
+                <textarea class="form-control" rows="6" placeholder="Type your answer here..." 
+                    oninput="window.updateTextAnswer(${index}, this.value)"
+                    style="font-size: 1rem; padding: 15px; border-radius: 10px; border: 2px solid #E2E8F0; width: 100%; resize: vertical;"
+                >${escapeHtml(answers[index] || '')}</textarea>
+            `;
+        } else {
+            optionsContainer.innerHTML = q.options.map((opt, i) => `
+                <label class="option-item ${answers[index] === i ? 'selected' : ''}" onclick="window.selectOption(${index}, ${i})">
+                    <input type="radio" name="q${index}" value="${i}" ${answers[index] === i ? 'checked' : ''}>
+                    <span>${escapeHtml(opt)}</span>
+                </label>
+            `).join('');
+        }
+
+        document.getElementById('btn-prev').disabled = index === 0;
+        document.getElementById('btn-next').innerHTML = index === questions.length - 1
+            ? 'Submit <i class="fas fa-check-circle"></i>'
+            : 'Next <i class="fas fa-chevron-right"></i>';
+
+        // Update nav
+        document.querySelectorAll('.q-nav-btn').forEach(btn => {
+            btn.classList.remove('active', 'current');
+            const btnIndex = parseInt(btn.dataset.index);
+            if (btnIndex === index) btn.classList.add('active', 'current');
+            if (answers[btnIndex] !== undefined && answers[btnIndex] !== '') btn.classList.add('answered');
+        });
+    }
+
+    // ====== NAVIGATION ======
+    window.goToQuestion = function(index) {
+        if (index >= 0 && index < questions.length) renderQuestion(index);
+    };
+
+    window.selectOption = function(qIndex, optionIndex) {
+        answers[qIndex] = optionIndex;
+        renderQuestion(qIndex);
+    };
+
+    window.updateTextAnswer = function(qIndex, value) {
+        answers[qIndex] = value;
+        // Update nav button visually
+        document.querySelectorAll('.q-nav-btn').forEach(btn => {
+            const btnIndex = parseInt(btn.dataset.index);
+            if (btnIndex === qIndex) {
+                if (value.trim() !== '') btn.classList.add('answered');
+                else btn.classList.remove('answered');
+            }
+        });
+    };
+
+    window.prevQuestion = function() {
+        if (currentQuestionIndex > 0) renderQuestion(currentQuestionIndex - 1);
+    };
+
+    window.nextQuestion = function() {
+        if (currentQuestionIndex < questions.length - 1) {
+            renderQuestion(currentQuestionIndex + 1);
+        } else {
+            confirmSubmit();
+        }
+    };
+
+    window.confirmSubmit = function() {
+        const answered = Object.entries(answers).filter(([k, v]) => {
+            const q = questions[parseInt(k)];
+            if (q && q.type === 'descriptive') return v && v.trim() !== '';
+            return v !== undefined && v !== null;
+        }).length;
+        const total = questions.length;
+        if (answered < total) {
+            if (!confirm(`You have answered ${answered} of ${total} questions. Are you sure you want to submit?`)) return;
+        } else {
+            if (!confirm('Are you sure you want to submit the test?')) return;
+        }
+        submitTest();
+    };
+
+    // ====== SUBMIT TEST ======
+    async function submitTest() {
+        if (!testActive) return;
+        testActive = false;
+        clearInterval(timerInterval);
+        detachAntiCheat();
+
+        const timeTaken = Math.round((currentPaper.duration || 60) * 60 - secondsLeft);
+        const formattedAnswers = Object.entries(answers).map(([qId, val]) => {
+            const q = questions[parseInt(qId)];
+            if (q && q.type === 'descriptive') {
+                return { questionId: parseInt(qId), selectedOption: -1, textAnswer: val || '' };
+            }
+            return { questionId: parseInt(qId), selectedOption: val };
+        });
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/submit`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    testId,
+                    answers: formattedAnswers,
+                    timeTaken
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Submit failed');
+            showResults(data);
+        } catch (err) {
+            alert('Error submitting test: ' + err.message);
+            showSelectionScreen();
+        }
+    }
+
+    // ====== SHOW RESULTS ======
+    function showResults(data) {
+        testScreen.style.display = 'none';
+        document.body.style.overflow = '';
+        resultsScreen.style.display = 'block';
+        window.scrollTo(0, 0);
+
+        document.getElementById('result-paper-title').textContent = currentPaper.title;
+        document.getElementById('score-value').textContent = data.percentage + '%';
+        document.getElementById('score-circle').style.setProperty('--score-deg', (data.percentage * 3.6) + 'deg');
+        document.getElementById('stat-correct').textContent = data.correctCount;
+        document.getElementById('stat-wrong').textContent = data.wrongCount;
+        document.getElementById('stat-unanswered').textContent = data.unansweredCount;
+        document.getElementById('stat-score').textContent = data.score;
+
+        const container = document.getElementById('detailed-results');
+        container.innerHTML = data.detailedResults.map((r, i) => {
+            if (r.type === 'descriptive') {
+                const status = (!r.textAnswer || r.textAnswer.trim() === '') ? 'unanswered' : 'unanswered';
+                const statusText = (!r.textAnswer || r.textAnswer.trim() === '') ? 'Unanswered' : 'Descriptive — Manual';
+                return `
+                <div class="result-question">
+                    <div class="result-question-header">
+                        <strong>Q${i + 1}.</strong> ${escapeHtml(r.question)}
+                        <span class="result-status ${status}">${statusText}</span>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
+                        <strong style="color: var(--text-dark);">Your Answer:</strong><br>
+                        <span style="color: var(--text-muted);">${escapeHtml(r.textAnswer || 'Not answered')}</span>
+                    </div>
+                    ${r.modelAnswer ? `<div style="background: #dcfce7; padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #22c55e;">
+                        <strong style="color: #15803d;">Model Answer:</strong><br>
+                        <span style="color: #15803d;">${escapeHtml(r.modelAnswer)}</span>
+                    </div>` : ''}
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        Marks: ${r.marks} (Manual evaluation required)
+                    </div>
+                </div>
+                `;
+            }
+            const status = r.isCorrect ? 'correct' : (r.selectedOption === undefined || r.selectedOption === null ? 'unanswered' : 'wrong');
+            const statusText = r.isCorrect ? 'Correct' : (r.selectedOption === undefined || r.selectedOption === null ? 'Unanswered' : 'Wrong');
+            return `
+            <div class="result-question">
+                <div class="result-question-header">
+                    <strong>Q${i + 1}.</strong> ${escapeHtml(r.question)}
+                    <span class="result-status ${status}">${statusText}</span>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    ${r.options.map((opt, idx) => {
+                        let cls = '';
+                        if (idx === r.correctAnswer) cls = 'correct-ans';
+                        else if (idx === r.selectedOption && !r.isCorrect) cls = 'wrong-ans';
+                        return `<div class="result-option ${cls}">${String.fromCharCode(65 + idx)}. ${escapeHtml(opt)}</div>`;
+                    }).join('')}
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    Marks: ${r.isCorrect ? '+' + r.marks : '0'} / ${r.marks}
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    // ====== SCREEN MANAGEMENT ======
+    window.showSelectionScreen = function() {
+        selectionScreen.style.display = 'block';
+        instructionsScreen.style.display = 'none';
+        testScreen.style.display = 'none';
+        resultsScreen.style.display = 'none';
+        document.body.style.overflow = '';
+        testActive = false;
+        clearInterval(timerInterval);
+        detachAntiCheat();
+        answers = {};
+        questions = [];
+        testId = null;
+        currentQuestionIndex = 0;
+        fetchPapers();
+    };
+
+    window.showInstructions = function(paperId) {
+        // Legacy handler - redirect to configure screen
+        const paper = papers.find(p => p._id === paperId);
+        if (paper) showConfigureScreen(paper);
+    };
+
+    window.downloadResult = function() {
+        const content = document.getElementById('results-screen').innerText;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `MockTest_Result_${currentPaper.title.replace(/\s+/g, '_')}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    // ====== ANTI-CHEAT ======
+    function attachAntiCheat() {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+    }
+
+    function detachAntiCheat() {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }
+
+    function handleVisibilityChange() {
+        if (!testActive) return;
+        if (document.hidden) {
+            blurCount++;
+            if (blurCount >= MAX_BLUR) {
+                tabWarningOverlay.style.display = 'flex';
+                setTimeout(() => submitTest(), 2000);
+            } else {
+                blurOverlay.style.display = 'flex';
+            }
+        } else {
+            blurOverlay.style.display = 'none';
+        }
+    }
+
+    function handleFullscreenChange() {
+        if (!testActive) return;
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        }
+    }
+
+    // ====== UTILS ======
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ====== PAST RESULTS ======
+    async function fetchPastResults() {
+        const list = document.getElementById('past-results-list');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/results`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Failed');
+            const results = await res.json();
+
+            if (!results.length) {
+                list.innerHTML = '<p class="text-muted" style="text-align: center; padding: 30px;">No past results yet. Take a test to see your results here!</p>';
+                return;
+            }
+
+            list.innerHTML = results.map(r => {
+                const paper = r.paperId || {};
+                const date = new Date(r.completedAt).toLocaleDateString();
+                const percentage = r.totalMarks > 0 ? ((r.score / r.totalMarks) * 100).toFixed(1) : 0;
+                return `
+                <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #E2E8F0; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-weight: 700; color: var(--text-dark);">${escapeHtml(paper.title || 'Unknown')}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(paper.subject || '')} · ${date}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color);">${percentage}%</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">${r.score}/${r.totalMarks} marks</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px; font-size: 0.85rem;">
+                        <span style="color: #22c55e;"><i class="fas fa-check-circle"></i> ${r.correctCount} Correct</span>
+                        <span style="color: #dc2626;"><i class="fas fa-times-circle"></i> ${r.wrongCount} Wrong</span>
+                        <span style="color: #6b7280;"><i class="fas fa-minus-circle"></i> ${r.unansweredCount} Unanswered</span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        } catch (err) {
+            list.innerHTML = '<p class="text-muted" style="text-align: center; padding: 30px;">Could not load past results.</p>';
+        }
+    }
+
+    // ====== INIT ======
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        fetchPapers();
+        fetchPastResults();
+    });
+})();
