@@ -156,7 +156,11 @@
             testScreen.style.display = 'block';
             document.body.style.overflow = 'hidden';
             testActive = true;
+            securityViolationShown = false;
             blurCount = 0;
+
+            // Request fullscreen immediately
+            document.documentElement.requestFullscreen().catch(() => {});
 
             // Start timer
             timerInterval = setInterval(() => {
@@ -170,6 +174,11 @@
 
             renderQuestion(0);
             attachAntiCheat();
+
+            // Hide all overlays just in case
+            document.getElementById('blur-overlay').style.display = 'none';
+            document.getElementById('tab-warning-overlay').style.display = 'none';
+            document.getElementById('security-overlay').style.display = 'none';
 
         } catch (err) {
             console.error(err);
@@ -312,6 +321,16 @@
         resultsScreen.style.display = 'block';
         window.scrollTo(0, 0);
 
+        // Hide all overlays
+        document.getElementById('blur-overlay').style.display = 'none';
+        document.getElementById('tab-warning-overlay').style.display = 'none';
+        document.getElementById('security-overlay').style.display = 'none';
+
+        // Exit fullscreen if active
+        if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+        }
+
         document.getElementById('result-paper-title').textContent = currentPaper.title;
         document.getElementById('score-value').textContent = data.percentage + '%';
         document.getElementById('score-circle').style.setProperty('--score-deg', (data.percentage * 3.6) + 'deg');
@@ -377,8 +396,20 @@
         resultsScreen.style.display = 'none';
         document.body.style.overflow = '';
         testActive = false;
+        securityViolationShown = false;
         clearInterval(timerInterval);
         detachAntiCheat();
+
+        // Hide all overlays
+        document.getElementById('blur-overlay').style.display = 'none';
+        document.getElementById('tab-warning-overlay').style.display = 'none';
+        document.getElementById('security-overlay').style.display = 'none';
+
+        // Exit fullscreen if active
+        if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+        }
+
         answers = {};
         questions = [];
         testId = null;
@@ -404,35 +435,281 @@
     };
 
     // ====== ANTI-CHEAT ======
+    let securityViolationShown = false;
+
+    function submitOnViolation(reason) {
+        if (!testActive || securityViolationShown) return;
+        securityViolationShown = true;
+        clearInterval(timerInterval);
+
+        const overlay = document.getElementById('security-overlay');
+        const msg = document.getElementById('security-msg');
+        if (overlay && msg) {
+            msg.textContent = reason;
+            overlay.style.display = 'flex';
+        }
+
+        // Auto-submit after a short delay so user sees the message
+        setTimeout(() => {
+            if (testActive) submitTest();
+        }, 1500);
+    }
+
     function attachAntiCheat() {
+        // Tab/window switch detection
         document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleWindowBlur);
         document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+        // Keyboard blocking (screenshots, dev tools, copy, select all, view source)
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        // Mouse / context menu blocking
+        document.addEventListener('contextmenu', handleContextMenu);
+        document.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        // Copy / cut / paste / drag blocking
+        document.addEventListener('copy', handleCopyCut);
+        document.addEventListener('cut', handleCopyCut);
+        document.addEventListener('dragstart', handleDrag);
+        document.addEventListener('drag', handleDrag);
+        document.addEventListener('selectstart', handleSelectStart);
+
+        // Print / screenshot via print dialog
+        window.addEventListener('beforeprint', handleBeforePrint);
+
+        // Back button / navigation trapping
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        trapBackButton();
     }
 
     function detachAntiCheat() {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('blur', handleWindowBlur);
         document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('keyup', handleKeyUp);
+        document.removeEventListener('contextmenu', handleContextMenu);
+        document.removeEventListener('mousedown', handleMouseDown);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('copy', handleCopyCut);
+        document.removeEventListener('cut', handleCopyCut);
+        document.removeEventListener('dragstart', handleDrag);
+        document.removeEventListener('drag', handleDrag);
+        document.removeEventListener('selectstart', handleSelectStart);
+        window.removeEventListener('beforeprint', handleBeforePrint);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        releaseBackButton();
     }
 
+    // === Tab / Window Switch ===
     function handleVisibilityChange() {
         if (!testActive) return;
         if (document.hidden) {
-            blurCount++;
-            if (blurCount >= MAX_BLUR) {
-                tabWarningOverlay.style.display = 'flex';
-                setTimeout(() => submitTest(), 2000);
-            } else {
-                blurOverlay.style.display = 'flex';
-            }
-        } else {
-            blurOverlay.style.display = 'none';
+            submitOnViolation('Tab switching or window minimization is not allowed. Your test has been submitted automatically.');
         }
     }
 
+    function handleWindowBlur() {
+        if (!testActive) return;
+        // Small delay to avoid false positives from clicking inside the app
+        setTimeout(() => {
+            if (!testActive) return;
+            if (!document.hasFocus() || document.hidden) {
+                submitOnViolation('Window focus was lost. Your test has been submitted automatically.');
+            }
+        }, 200);
+    }
+
+    // === Fullscreen Enforcement ===
     function handleFullscreenChange() {
         if (!testActive) return;
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(() => {});
+        }
+    }
+
+    // === Keyboard Security ===
+    function handleKeyDown(e) {
+        if (!testActive) return;
+        const key = e.key;
+        const code = e.code;
+        const ctrl = e.ctrlKey || e.metaKey;
+        const shift = e.shiftKey;
+        const alt = e.altKey;
+
+        // Screenshot / system keys
+        if (code === 'PrintScreen' || key === 'PrintScreen' || key === 'Snapshot') {
+            e.preventDefault();
+            submitOnViolation('Screenshots are not allowed. Your test has been submitted automatically.');
+            return;
+        }
+
+        // F12 (DevTools)
+        if (key === 'F12') {
+            e.preventDefault();
+            submitOnViolation('Developer tools are not allowed during the test. Your test has been submitted automatically.');
+            return;
+        }
+
+        // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (DevTools)
+        if (ctrl && shift && (key === 'I' || key === 'J' || key === 'C' || code === 'KeyI' || code === 'KeyJ' || code === 'KeyC')) {
+            e.preventDefault();
+            submitOnViolation('Developer tools are not allowed during the test. Your test has been submitted automatically.');
+            return;
+        }
+
+        // Ctrl+U (View Source)
+        if (ctrl && (key === 'u' || key === 'U' || code === 'KeyU')) {
+            e.preventDefault();
+            submitOnViolation('Viewing page source is not allowed. Your test has been submitted automatically.');
+            return;
+        }
+
+        // Ctrl+Shift+S (Windows Snipping Tool / Save As)
+        if (ctrl && shift && (key === 'S' || code === 'KeyS')) {
+            e.preventDefault();
+            submitOnViolation('Screenshots are not allowed. Your test has been submitted automatically.');
+            return;
+        }
+
+        // Windows+Shift+S (Snipping tool) — can't fully block, but we can try
+        if (shift && (key === 'S' || code === 'KeyS') && !ctrl && !alt) {
+            // Can't reliably detect Windows key alone, but we can be aggressive on Shift+S
+            // This is a heuristic — it may cause false positives if user types Shift+S in a textarea
+            // But for exam security, it's acceptable
+        }
+
+        // Ctrl+A (Select All)
+        if (ctrl && (key === 'a' || key === 'A' || code === 'KeyA')) {
+            e.preventDefault();
+            return;
+        }
+
+        // Ctrl+C / Ctrl+X (Copy / Cut)
+        if (ctrl && (key === 'c' || key === 'C' || key === 'x' || key === 'X' || code === 'KeyC' || code === 'KeyX')) {
+            e.preventDefault();
+            submitOnViolation('Copying content is not allowed. Your test has been submitted automatically.');
+            return;
+        }
+
+        // Ctrl+S (Save Page)
+        if (ctrl && (key === 's' || key === 'S' || code === 'KeyS')) {
+            e.preventDefault();
+            submitOnViolation('Saving the page is not allowed. Your test has been submitted automatically.');
+            return;
+        }
+
+        // Alt+Left / Backspace (Back navigation)
+        if (key === 'Backspace' || key === 'Alt' || alt) {
+            // Let Backspace work in textareas, but block it elsewhere
+            const targetTag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+            if (key === 'Backspace' && (targetTag === 'input' || targetTag === 'textarea' || e.target.isContentEditable)) {
+                return; // allow backspace in text inputs
+            }
+            if (alt && (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Left' || key === 'Right')) {
+                e.preventDefault();
+                submitOnViolation('Back navigation is not allowed during the test. Your test has been submitted automatically.');
+                return;
+            }
+        }
+
+        // Escape key (can exit fullscreen)
+        if (key === 'Escape') {
+            e.preventDefault();
+            document.documentElement.requestFullscreen().catch(() => {});
+            return;
+        }
+    }
+
+    function handleKeyUp(e) {
+        if (!testActive) return;
+        // Detect PrintScreen on keyup (some systems trigger it on keyup)
+        if (e.code === 'PrintScreen' || e.key === 'PrintScreen' || e.key === 'Snapshot') {
+            e.preventDefault();
+            submitOnViolation('Screenshots are not allowed. Your test has been submitted automatically.');
+        }
+    }
+
+    // === Mouse Security ===
+    function handleContextMenu(e) {
+        if (!testActive) return;
+        e.preventDefault();
+        submitOnViolation('Right-click / context menu is not allowed during the test. Your test has been submitted automatically.');
+    }
+
+    function handleMouseDown(e) {
+        if (!testActive) return;
+        // Block right-click (button 2) and middle-click (button 1)
+        if (e.button === 2) {
+            e.preventDefault();
+            submitOnViolation('Right-click is not allowed during the test. Your test has been submitted automatically.');
+        }
+        // Block middle-click (often opens in new tab)
+        if (e.button === 1) {
+            e.preventDefault();
+        }
+    }
+
+    function handleMouseUp(e) {
+        if (!testActive) return;
+        if (e.button === 2) {
+            e.preventDefault();
+        }
+    }
+
+    function handleCopyCut(e) {
+        if (!testActive) return;
+        e.preventDefault();
+        submitOnViolation('Copying or cutting content is not allowed. Your test has been submitted automatically.');
+    }
+
+    function handleDrag(e) {
+        if (!testActive) return;
+        e.preventDefault();
+    }
+
+    function handleSelectStart(e) {
+        if (!testActive) return;
+        e.preventDefault();
+    }
+
+    // === Print / Screenshot ===
+    function handleBeforePrint(e) {
+        if (!testActive) return;
+        e.preventDefault();
+        submitOnViolation('Printing the page is not allowed. Your test has been submitted automatically.');
+    }
+
+    // === Navigation / Back Button ===
+    function handleBeforeUnload(e) {
+        if (!testActive) return;
+        // Submit the test before leaving
+        submitTest();
+        const msg = 'You are leaving the test. It will be submitted automatically.';
+        e.returnValue = msg;
+        return msg;
+    }
+
+    let backTrapState = null;
+    function trapBackButton() {
+        if (!testActive) return;
+        // Push a dummy state so the user can't go back normally
+        history.pushState({ test: true }, document.title, location.href);
+        backTrapState = () => {
+            if (!testActive) return;
+            history.pushState({ test: true }, document.title, location.href);
+            submitOnViolation('Back navigation is not allowed during the test. Your test has been submitted automatically.');
+        };
+        window.addEventListener('popstate', backTrapState);
+    }
+
+    function releaseBackButton() {
+        if (backTrapState) {
+            window.removeEventListener('popstate', backTrapState);
+            backTrapState = null;
         }
     }
 
