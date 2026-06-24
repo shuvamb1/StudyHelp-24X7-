@@ -165,6 +165,26 @@
             background: #f8fafc;
             z-index: 9999;
             overflow: hidden;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+        }
+        .test-screen * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+        }
+        .test-screen input, .test-screen textarea, .test-screen [contenteditable] {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+        .test-screen img, .test-screen canvas, .test-screen svg {
+            pointer-events: none !important;
+            -webkit-user-drag: none !important;
         }
         .test-header {
             background: white;
@@ -658,6 +678,13 @@
         <i class="fas fa-ban" style="font-size: 4rem; margin-bottom: 20px;"></i>
         <h2>Test Terminated</h2>
         <p>You have violated the anti-cheat policy by switching tabs or minimizing the window. Your test has been submitted automatically.</p>
+    </div>
+
+    <!-- Security Violation Overlay -->
+    <div class="tab-warning-overlay" id="security-overlay">
+        <i class="fas fa-shield-alt" style="font-size: 4rem; margin-bottom: 20px;"></i>
+        <h2>Security Violation Detected</h2>
+        <p id="security-msg">Your test has been submitted automatically due to a security policy violation.</p>
     </div>
 
     <!-- Results Screen (shown in main content) -->
