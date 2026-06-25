@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let materialsData = [];
     let currentPage = 1;
-    const itemsPerPage = 8;
+    const itemsPerPage = 9;
 
     function renderPagination(totalItems, activePage) {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesSearch && matchesAnyFilter;
         });
 
-        // Always paginate - show 8 per page
+        // Always paginate - show 9 per page
         const totalItems = filtered.length;
         const startIndex = (currentPage - 1) * itemsPerPage;
         const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
