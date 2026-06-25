@@ -179,6 +179,7 @@
 
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Questions with AI...';
+        answers = {}; // reset answers for new test
 
         try {
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/start`, {
@@ -260,11 +261,27 @@
 
         const optionsContainer = document.getElementById('q-options');
         if (q.type === 'descriptive') {
+            const existingAnswer = answers[index] || {};
+            const hasFile = existingAnswer.fileId;
             optionsContainer.innerHTML = `
-                <textarea class="form-control" rows="6" placeholder="Type your answer here..." 
-                    oninput="window.updateTextAnswer(${index}, this.value)"
-                    style="font-size: 1rem; padding: 15px; border-radius: 10px; border: 2px solid #E2E8F0; width: 100%; resize: vertical;"
-                >${escapeHtml(answers[index] || '')}</textarea>
+                <div style="background: #f8fafc; border: 2px dashed #E2E8F0; border-radius: 12px; padding: 30px; text-align: center;" id="upload-area-${index}">
+                    <i class="fas fa-file-upload" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px; display: block;"></i>
+                    <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 8px; font-size: 1.05rem;">Upload Your Written Answer</div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+                        Write your answer on paper.<br>
+                        Take a clear photo or scan it.<br>
+                        Convert to PDF (preferred) and upload.
+                    </div>
+                    <label class="btn btn-primary" style="cursor: pointer; display: inline-block; position: relative; overflow: hidden;">
+                        <i class="fas fa-cloud-upload-alt"></i> ${hasFile ? 'Replace File' : 'Select File (PDF/Image)'}
+                        <input type="file" accept="application/pdf,image/png,image/jpeg,image/jpg" 
+                            onchange="window.handleFileUpload(${index}, this)" 
+                            style="position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                    </label>
+                    <div id="file-status-${index}" style="margin-top: 15px; font-size: 0.85rem;">
+                        ${hasFile ? renderFileStatus(existingAnswer) : '<span style="color: var(--text-muted);">Max file size: 5 MB</span>'}
+                    </div>
+                </div>
             `;
         } else {
             optionsContainer.innerHTML = q.options.map((opt, i) => `
@@ -285,9 +302,67 @@
             btn.classList.remove('active', 'current');
             const btnIndex = parseInt(btn.dataset.index);
             if (btnIndex === index) btn.classList.add('active', 'current');
-            if (answers[btnIndex] !== undefined && answers[btnIndex] !== '') btn.classList.add('answered');
+            if (isAnswered(btnIndex)) btn.classList.add('answered');
         });
     }
+
+    function renderFileStatus(answer) {
+        if (!answer || !answer.fileId) return '';
+        return `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #dcfce7; border: 1px solid #22c55e; border-radius: 8px; padding: 10px 15px;">
+                <i class="fas fa-check-circle" style="color: #15803d;"></i>
+                <span style="color: #15803d; font-weight: 600;">${escapeHtml(answer.fileName || 'Uploaded')}</span>
+                <button onclick="event.stopPropagation(); window.removeFileAnswer(${currentQuestionIndex})" 
+                    style="background: none; border: none; color: #b91c1c; cursor: pointer; font-size: 0.9rem; margin-left: 8px;" 
+                    title="Remove file">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    window.handleFileUpload = async function(qIndex, input) {
+        const file = input.files[0];
+        if (!file) return;
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size exceeds 5 MB limit. Please upload a smaller file.');
+            input.value = '';
+            return;
+        }
+        const statusEl = document.getElementById(`file-status-${qIndex}`);
+        if (statusEl) {
+            statusEl.innerHTML = '<div style="color: var(--primary-color);"><i class="fas fa-spinner fa-spin"></i> Uploading...</div>';
+        }
+        try {
+            const formData = new FormData();
+            formData.append('answerFile', file);
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/upload-answer`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Upload failed');
+            }
+            answers[qIndex] = { fileId: data.fileId, fileName: data.fileName };
+            renderQuestion(qIndex);
+        } catch (err) {
+            console.error('Upload error:', err);
+            if (statusEl) {
+                statusEl.innerHTML = `<div style="color: #dc2626;"><i class="fas fa-exclamation-circle"></i> Upload failed: ${escapeHtml(err.message)}</div>`;
+            }
+            alert('Failed to upload answer file: ' + err.message);
+        }
+    };
+
+    window.removeFileAnswer = function(qIndex) {
+        if (confirm('Are you sure you want to remove this uploaded file?')) {
+            answers[qIndex] = undefined;
+            renderQuestion(qIndex);
+        }
+    };
 
     // ====== NAVIGATION ======
     window.goToQuestion = function(index) {
@@ -311,6 +386,18 @@
         });
     };
 
+    function isAnswered(qIndex) {
+        const q = questions[qIndex];
+        if (!q) return false;
+        const ans = answers[qIndex];
+        if (q.type === 'descriptive') {
+            if (ans && typeof ans === 'object' && ans.fileId) return true;
+            if (typeof ans === 'string' && ans.trim() !== '') return true;
+            return false;
+        }
+        return ans !== undefined && ans !== null;
+    }
+
     window.prevQuestion = function() {
         if (currentQuestionIndex > 0) renderQuestion(currentQuestionIndex - 1);
     };
@@ -324,11 +411,7 @@
     };
 
     window.confirmSubmit = function() {
-        const answered = Object.entries(answers).filter(([k, v]) => {
-            const q = questions[parseInt(k)];
-            if (q && q.type === 'descriptive') return v && v.trim() !== '';
-            return v !== undefined && v !== null;
-        }).length;
+        const answered = Object.keys(answers).filter(k => isAnswered(parseInt(k))).length;
         const total = questions.length;
         if (answered < total) {
             if (!confirm(`You have answered ${answered} of ${total} questions. Are you sure you want to submit?`)) return;
@@ -349,6 +432,9 @@
         const formattedAnswers = Object.entries(answers).map(([qId, val]) => {
             const q = questions[parseInt(qId)];
             if (q && q.type === 'descriptive') {
+                if (val && typeof val === 'object' && val.fileId) {
+                    return { questionId: parseInt(qId), selectedOption: -1, textAnswer: '', fileId: val.fileId, fileName: val.fileName || '' };
+                }
                 return { questionId: parseInt(qId), selectedOption: -1, textAnswer: val || '' };
             }
             return { questionId: parseInt(qId), selectedOption: val };
@@ -404,8 +490,9 @@
         const container = document.getElementById('detailed-results');
         container.innerHTML = data.detailedResults.map((r, i) => {
             if (r.type === 'descriptive') {
-                const status = (!r.textAnswer || r.textAnswer.trim() === '') ? 'unanswered' : 'unanswered';
-                const statusText = (!r.textAnswer || r.textAnswer.trim() === '') ? 'Unanswered' : 'Descriptive — Manual';
+                const hasFile = r.fileId && r.fileName;
+                const status = hasFile ? 'unanswered' : 'unanswered';
+                const statusText = hasFile ? 'Answer Uploaded (Manual Evaluation)' : 'Unanswered';
                 return `
                 <div class="result-question">
                     <div class="result-question-header">
@@ -414,7 +501,7 @@
                     </div>
                     <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
                         <strong style="color: var(--text-dark);">Your Answer:</strong><br>
-                        <span style="color: var(--text-muted);">${escapeHtml(r.textAnswer || 'Not answered')}</span>
+                        ${hasFile ? `<a href="${API_BASE_URL}/api/answer-files/${r.fileId}" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 600;"><i class="fas fa-file-pdf"></i> ${escapeHtml(r.fileName)}</a>` : '<span style="color: var(--text-muted);">Not answered</span>'}
                     </div>
                     ${r.modelAnswer ? `<div style="background: #dcfce7; padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #22c55e;">
                         <strong style="color: #15803d;">Model Answer:</strong><br>
