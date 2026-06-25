@@ -68,7 +68,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-main);
   margin-bottom: 1rem;
   line-height: 1.2;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 a {
@@ -421,7 +421,7 @@ footer {
   color: var(--text-main);
   margin-bottom: 20px;
   text-shadow: none;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.025em;
 }
@@ -474,7 +474,7 @@ footer {
   font-size: 3rem;
   color: var(--primary-color);
   margin-bottom: 5px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .stat-item p {
   color: var(--text-muted);
@@ -706,7 +706,7 @@ footer {
 
 .community-heading {
   font-size: 3.5rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.1;
   margin-bottom: 20px;
   background: linear-gradient(90deg, #000000 0%, #6600FF 40%, #000000 100%);
@@ -750,7 +750,7 @@ footer {
 }
 
 .faq-question {
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-main);
   font-size: 1.05rem;
   padding: 22px 28px;
@@ -1063,7 +1063,7 @@ footer {
     color: var(--primary-color);
     margin-bottom: 16px;
     line-height: 1.1;
-    font-weight: 900;
+    font-weight: 700;
     letter-spacing: -0.5px;
 }
 
