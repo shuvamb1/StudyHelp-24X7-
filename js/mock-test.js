@@ -103,6 +103,68 @@
         document.getElementById('test-duration').value = '60';
         document.getElementById('question-type').value = 'mcq';
 
+        // Fetch previous result to show adaptive difficulty
+        const prevResultContainer = document.getElementById('prev-result-info');
+        if (prevResultContainer) {
+            prevResultContainer.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.85rem;"><i class="fas fa-spinner fa-spin"></i> Checking past performance...</div>';
+            fetch(`${API_BASE_URL}/api/mock-tests/${paper._id}/previous-result`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.hasPreviousResult) {
+                    let diffLabel = 'Standard';
+                    let diffColor = '#6b7280';
+                    let bgColor = '#f8fafc';
+                    let borderColor = '#e2e8f0';
+                    let iconColor = '#6b7280';
+                    if (data.targetDifficulty === 'easy') {
+                        diffLabel = 'Easier';
+                        diffColor = '#22c55e';
+                        bgColor = '#f0fdf4';
+                        borderColor = '#22c55e';
+                        iconColor = '#15803d';
+                    } else if (data.targetDifficulty === 'medium-hard') {
+                        diffLabel = 'Harder';
+                        diffColor = '#f59e0b';
+                        bgColor = '#fffbeb';
+                        borderColor = '#f59e0b';
+                        iconColor = '#b45309';
+                    } else if (data.targetDifficulty === 'hard') {
+                        diffLabel = 'Hard';
+                        diffColor = '#dc2626';
+                        bgColor = '#fef2f2';
+                        borderColor = '#dc2626';
+                        iconColor = '#b91c1c';
+                    }
+                    prevResultContainer.innerHTML = `
+                    <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <i class="fas fa-chart-line" style="color: ${iconColor};"></i>
+                            <strong style="color: ${iconColor};">Adaptive Difficulty Active</strong>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-dark);">
+                            Your previous score: <strong>${data.percentage}%</strong> (${data.score}/${data.totalMarks})
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">
+                            Next test difficulty: <span style="font-weight: 700; color: ${diffColor};">${diffLabel}</span>
+                        </div>
+                    </div>
+                    `;
+                } else {
+                    prevResultContainer.innerHTML = `
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">
+                        <i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 8px;"></i>
+                        No previous result for this paper. Difficulty will be set to <strong>Standard</strong> (same as PYQs).
+                    </div>
+                    `;
+                }
+            })
+            .catch(() => {
+                prevResultContainer.innerHTML = '';
+            });
+        }
+
         // Update button handler
         const startBtn = document.getElementById('start-test-btn');
         startBtn.onclick = () => generateAndStartTest();
