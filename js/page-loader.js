@@ -6,7 +6,7 @@
     loader.id = LOADER_ID;
     loader.innerHTML =
       '<div class="page-loader-spinner" aria-hidden="true">' +
-      '<img src="assets/images/logo.png" alt="StudyHelp 24x7" class="page-loader-logo">' +
+      '<img src="assets/images/logo_load.svg" alt="StudyHelp 24x7" class="page-loader-logo">' +
       '</div>';
     return loader;
   }
