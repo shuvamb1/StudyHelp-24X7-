@@ -46,11 +46,11 @@
             }
             noPapers.style.display = 'none';
 
-            grid.innerHTML = papers.map(paper => {
+            grid.innerHTML = papers.map((paper, idx) => {
                 const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
                 const hasPDFs = pdfCount > 0;
                 return `
-                <div class="paper-card ${hasPDFs ? '' : 'paper-card-disabled'}">
+                <div class="paper-card ${hasPDFs ? '' : 'paper-card-disabled'}" data-idx="${idx}" data-title="${escapeHtml(paper.title)}" data-subject="${escapeHtml(paper.subject)}" data-dept="${escapeHtml(paper.department)}" data-sem="${escapeHtml(paper.semester)}">
                     <div class="paper-card-header">
                         <div class="paper-title">${escapeHtml(paper.title)}</div>
                         <span class="paper-badge">${escapeHtml(paper.department)}</span>
@@ -61,11 +61,9 @@
                         <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(paper.year || 'N/A')}</span>
                         <span><i class="fas fa-file-pdf"></i> ${pdfCount} PYQ PDF(s)</span>
                     </div>
-                    <div class="paper-stats">
-                        <div class="paper-stat">
-                            <div class="paper-stat-value">${pdfCount}</div>
-                            <div class="paper-stat-label">PYQs</div>
-                        </div>
+                    <div class="paper-card-footer">
+                        <button class="btn btn-give-test ${hasPDFs ? '' : 'disabled'}" ${hasPDFs ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForPaper(${idx})"><i class="fas fa-play"></i> Give Test</button>
+                        <button class="btn btn-past-results" onclick="event.stopPropagation(); window.showPastResultsForPaper(${idx})"><i class="fas fa-chart-bar"></i> Past Results</button>
                     </div>
                     ${hasPDFs ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
                 </div>
@@ -549,6 +547,10 @@
         clearInterval(timerInterval);
         detachAntiCheat();
 
+        // Remove past results modal if present
+        const prModal = document.getElementById('past-results-modal');
+        if (prModal) prModal.remove();
+
         // Hide all overlays
         document.getElementById('blur-overlay').style.display = 'none';
         document.getElementById('tab-warning-overlay').style.display = 'none';
@@ -920,6 +922,100 @@
         }
     }
 
+    // ====== SEARCH & FILTER ======
+    function filterPapers() {
+        const searchVal = (document.getElementById('mock-search')?.value || '').toLowerCase();
+        const checkedDepts = [...document.querySelectorAll('.filter-dept:checked')].map(cb => cb.value);
+        const checkedSems = [...document.querySelectorAll('.filter-sem:checked')].map(cb => cb.value);
+
+        document.querySelectorAll('#papers-grid .paper-card').forEach(card => {
+            const title = (card.dataset.title || '').toLowerCase();
+            const subject = (card.dataset.subject || '').toLowerCase();
+            const dept = card.dataset.dept || '';
+            const sem = card.dataset.sem || '';
+
+            const matchesSearch = !searchVal || title.includes(searchVal) || subject.includes(searchVal);
+            const matchesDept = !checkedDepts.length || checkedDepts.includes(dept);
+            const matchesSem = !checkedSems.length || checkedSems.includes(sem);
+
+            card.style.display = (matchesSearch && matchesDept && matchesSem) ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('mock-search')?.addEventListener('input', filterPapers);
+        document.getElementById('apply-filters-btn')?.addEventListener('click', filterPapers);
+    });
+
+    window.startTestForPaper = function(idx) {
+        const paper = papers[idx];
+        if (paper) showConfigureScreen(paper);
+    };
+
+    window.showPastResultsForPaper = async function(idx) {
+        const paper = papers[idx];
+        if (!paper) return;
+        selectionScreen.style.display = 'none';
+        instructionsScreen.style.display = 'none';
+        resultsScreen.style.display = 'none';
+        testScreen.style.display = 'none';
+
+        const container = document.createElement('div');
+        container.id = 'past-results-modal';
+        container.style.cssText = 'max-width:800px; margin:0 auto; padding:20px 0;';
+        container.innerHTML = `
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                <button class="btn btn-outline" onclick="document.getElementById('past-results-modal').remove(); document.getElementById('selection-screen').style.display='block';" style="padding:8px 16px;"><i class="fas fa-arrow-left"></i></button>
+                <h2 style="margin:0;"><i class="fas fa-chart-bar" style="color:var(--primary-color);"></i> Past Results — ${escapeHtml(paper.title)}</h2>
+            </div>
+            <div id="paper-results-loading" style="text-align:center; padding:40px; color:var(--text-muted);">
+                <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i> Loading results...
+            </div>
+            <div id="paper-results-list"></div>
+        `;
+        document.getElementById('main-content').appendChild(container);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/mock-tests/results?paperId=${paper._id}`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Failed');
+            const results = await res.json();
+            const loadingEl = document.getElementById('paper-results-loading');
+            const listEl = document.getElementById('paper-results-list');
+
+            if (!results.length) {
+                loadingEl.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">No past results for this paper yet.</p>';
+                return;
+            }
+            loadingEl.style.display = 'none';
+            listEl.innerHTML = results.map(r => {
+                const date = new Date(r.completedAt).toLocaleDateString();
+                const percentage = r.totalMarks > 0 ? ((r.score / r.totalMarks) * 100).toFixed(1) : 0;
+                return `
+                <div style="background:white; border-radius:12px; padding:20px; border:1px solid #E2E8F0; margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div>
+                            <div style="font-weight:700; color:var(--text-dark);">${escapeHtml(paper.title)}</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">${date}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:1.5rem; font-weight:800; color:var(--primary-color);">${percentage}%</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted);">${r.score}/${r.totalMarks} marks</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:15px; font-size:0.85rem;">
+                        <span style="color:#22c55e;"><i class="fas fa-check-circle"></i> ${r.correctCount} Correct</span>
+                        <span style="color:#dc2626;"><i class="fas fa-times-circle"></i> ${r.wrongCount} Wrong</span>
+                        <span style="color:#6b7280;"><i class="fas fa-minus-circle"></i> ${r.unansweredCount} Unanswered</span>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch (err) {
+            document.getElementById('paper-results-loading').innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">Could not load results.</p>';
+        }
+    };
+
     // ====== INIT ======
     document.addEventListener('DOMContentLoaded', () => {
         if (!token) {
@@ -927,6 +1023,5 @@
             return;
         }
         fetchPapers();
-        fetchPastResults();
     });
 })();
