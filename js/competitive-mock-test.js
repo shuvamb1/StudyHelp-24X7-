@@ -155,7 +155,7 @@
         const btn = document.getElementById('start-test-btn');
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Questions with AI...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating questions in parallel...';
         answers = {};
 
         try {
