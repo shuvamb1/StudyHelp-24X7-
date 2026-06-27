@@ -11,33 +11,85 @@
     <style>
         .mock-container {
             max-width: 1200px;
-            margin: 120px auto 50px;
+            margin: 0 auto;
             padding: 0 20px;
         }
         .mock-hero {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, rgba(102,0,255,0.08) 0%, rgba(99,102,241,0.06) 100%);
-            border-radius: var(--border-radius-lg);
-            margin-bottom: 40px;
-            border: 1px solid rgba(102,0,255,0.1);
+            display: none;
         }
         .mock-hero h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            display: none;
         }
         .mock-hero p {
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
+            display: none;
+        }
+
+        .mock-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .mock-filter-sidebar {
+            background: var(--bg-white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E2E8F0;
+            align-self: start;
+        }
+        .mock-filter-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .mock-filter-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .mock-filter-title {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        .mock-filter-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .mock-filter-option input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+        .mock-search-bar {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        .mock-search-input {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-family: var(--font-body);
+        }
+        .mock-search-btn {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         .papers-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
         .paper-card {
@@ -95,24 +147,38 @@
             align-items: center;
             gap: 5px;
         }
-        .paper-stats {
+        .paper-card-footer {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #E2E8F0;
         }
-        .paper-stat {
+        .paper-card-footer .btn {
+            flex: 1;
             text-align: center;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
         }
-        .paper-stat-value {
-            font-weight: 700;
-            font-size: 1.2rem;
+        .paper-card-footer .btn-give-test {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        .paper-card-footer .btn-give-test:hover {
+            background: var(--accent-color);
+        }
+        .paper-card-footer .btn-past-results {
+            background: white;
             color: var(--primary-color);
+            border: 2px solid var(--primary-color);
         }
-        .paper-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
+        .paper-card-footer .btn-past-results:hover {
+            background: rgba(102,0,255,0.05);
         }
 
         /* Instructions Screen */
@@ -497,10 +563,26 @@
         }
 
         @media (max-width: 768px) {
+            .mock-layout { grid-template-columns: 1fr; }
+            .mock-search-bar { flex-direction: row; gap: 8px; }
+            .mock-search-input {
+                border-radius: var(--border-radius) !important;
+                width: 100%;
+            }
+            .mock-search-btn {
+                border-radius: var(--border-radius) !important;
+                padding: 12px 20px;
+                width: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .mock-search-text { display: none; }
+            .papers-grid { grid-template-columns: 1fr; }
+            .paper-card-footer { flex-direction: column; }
             .test-sidebar { display: none; }
             .test-main { padding: 20px; }
             .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .mock-hero h1 { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -535,28 +617,54 @@
         </div>
     </header>
 
-    <main class="mock-container" id="main-content">
+    <main class="mock-container container" style="padding-top:110px;" id="main-content">
         <!-- Paper Selection Screen -->
         <div id="selection-screen">
-            <div class="mock-hero reveal active">
-                <h1><i class="fas fa-brain"></i> AI-Powered Mock Tests</h1>
-                <p>Practice with Previous Year Question papers. Our AI model learns from PYQs to generate realistic mock tests. Select a paper to begin.</p>
-            </div>
-            <div id="papers-loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
-                Loading available papers...
-            </div>
-            <div id="papers-grid" class="papers-grid"></div>
-            <div id="no-papers" style="display: none; text-align: center; padding: 60px 20px;">
-                <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 15px;"></i>
-                <h3>No papers available yet</h3>
-                <p class="text-muted">Check back later. Admin will upload PYQ papers soon.</p>
-            </div>
+            <div class="mock-layout">
+                <!-- Sidebar Filters -->
+                <aside class="mock-filter-sidebar">
+                    <h3 style="margin-bottom: 20px;"><i class="fas fa-filter"></i> Filters</h3>
 
-            <!-- Past Results -->
-            <div id="past-results-section" style="margin-top: 50px;">
-                <h2 style="margin-bottom: 20px;"><i class="fas fa-chart-bar" style="color: var(--primary-color);"></i> Your Past Results</h2>
-                <div id="past-results-list"></div>
+                    <div class="mock-filter-section">
+                        <h4 class="mock-filter-title">Department</h4>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Computer Science"> Computer Science</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Microbiology"> Microbiology</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Mathematics"> Mathematics</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Statistics"> Statistics</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Physics"> Physics</label>
+                    </div>
+
+                    <div class="mock-filter-section">
+                        <h4 class="mock-filter-title">Semester</h4>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester I"> Semester I</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester II"> Semester II</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester III"> Semester III</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester IV"> Semester IV</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester V"> Semester V</label>
+                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester VI"> Semester VI</label>
+                    </div>
+
+                    <button class="btn btn-primary" id="apply-filters-btn" style="width: 100%;">Apply Filters</button>
+                </aside>
+
+                <!-- Papers Content -->
+                <section class="mock-content">
+                    <div class="mock-search-bar">
+                        <input type="text" class="mock-search-input" id="mock-search" placeholder="Search for subjects, topics, or paper titles...">
+                        <button class="mock-search-btn"><i class="fas fa-search"></i><span class="mock-search-text"> Search</span></button>
+                    </div>
+
+                    <div id="papers-loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                        Loading available papers...
+                    </div>
+                    <div id="papers-grid" class="papers-grid"></div>
+                    <div id="no-papers" style="display: none; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 15px;"></i>
+                        <h3>No papers available yet</h3>
+                        <p class="text-muted">Check back later. Admin will upload PYQ papers soon.</p>
+                    </div>
+                </section>
             </div>
         </div>
 
