@@ -51,10 +51,8 @@
                 const hasPDFs = pdfCount > 0;
                 return `
                 <div class="paper-card ${hasPDFs ? '' : 'paper-card-disabled'}" data-idx="${idx}" data-title="${escapeHtml(paper.title)}" data-subject="${escapeHtml(paper.subject)}" data-dept="${escapeHtml(paper.department)}" data-sem="${escapeHtml(paper.semester)}">
-                    <div class="paper-card-header">
-                        <div class="paper-title">${escapeHtml(paper.title)}</div>
-                        <span class="paper-badge">${escapeHtml(paper.department)}</span>
-                    </div>
+                    <div class="paper-badge" style="margin-bottom: 10px;">${escapeHtml(paper.department)}</div>
+                    <div class="paper-title">${escapeHtml(paper.title)}</div>
                     <div class="paper-meta">
                         <span><i class="fas fa-book"></i> ${escapeHtml(paper.subject)}</span>
                         <span><i class="fas fa-calendar"></i> ${escapeHtml(paper.semester)}</span>
@@ -62,8 +60,8 @@
                         <span><i class="fas fa-file-pdf"></i> ${pdfCount} PYQ PDF(s)</span>
                     </div>
                     <div class="paper-card-footer">
-                        <button class="btn btn-give-test ${hasPDFs ? '' : 'disabled'}" ${hasPDFs ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForPaper(${idx})"><i class="fas fa-play"></i> Give Test</button>
-                        <button class="btn btn-past-results" onclick="event.stopPropagation(); window.showPastResultsForPaper(${idx})"><i class="fas fa-chart-bar"></i> Past Results</button>
+                        <button class="btn btn-give-test ${hasPDFs ? '' : 'disabled'}" ${hasPDFs ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForPaper(${idx})">Give Test</button>
+                        <button class="btn btn-past-results" onclick="event.stopPropagation(); window.showPastResultsForPaper(${idx})">Past Results</button>
                     </div>
                     ${hasPDFs ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
                 </div>
@@ -137,8 +135,7 @@
                     }
                     prevResultContainer.innerHTML = `
                     <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                            <i class="fas fa-chart-line" style="color: ${iconColor};"></i>
+                        <div style="margin-bottom: 8px;">
                             <strong style="color: ${iconColor};">Adaptive Difficulty Active</strong>
                         </div>
                         <div style="font-size: 0.9rem; color: var(--text-dark);">
@@ -152,7 +149,6 @@
                 } else {
                     prevResultContainer.innerHTML = `
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">
-                        <i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 8px;"></i>
                         No previous result for this paper. Difficulty will be set to <strong>Standard</strong> (same as PYQs).
                     </div>
                     `;
@@ -966,7 +962,7 @@
         container.innerHTML = `
             <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
                 <button class="btn btn-outline" onclick="document.getElementById('past-results-modal').remove(); document.getElementById('selection-screen').style.display='block';" style="padding:8px 16px;"><i class="fas fa-arrow-left"></i></button>
-                <h2 style="margin:0;"><i class="fas fa-chart-bar" style="color:var(--primary-color);"></i> Past Results — ${escapeHtml(paper.title)}</h2>
+                <h2 style="margin:0;">Past Results — ${escapeHtml(paper.title)}</h2>
             </div>
             <div id="paper-results-loading" style="text-align:center; padding:40px; color:var(--text-muted);">
                 <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i> Loading results...
@@ -1005,9 +1001,9 @@
                         </div>
                     </div>
                     <div style="display:flex; gap:15px; font-size:0.85rem;">
-                        <span style="color:#22c55e;"><i class="fas fa-check-circle"></i> ${r.correctCount} Correct</span>
-                        <span style="color:#dc2626;"><i class="fas fa-times-circle"></i> ${r.wrongCount} Wrong</span>
-                        <span style="color:#6b7280;"><i class="fas fa-minus-circle"></i> ${r.unansweredCount} Unanswered</span>
+                        <span style="color:#22c55e;">${r.correctCount} Correct</span>
+                        <span style="color:#dc2626;">${r.wrongCount} Wrong</span>
+                        <span style="color:#6b7280;">${r.unansweredCount} Unanswered</span>
                     </div>
                 </div>`;
             }).join('');
