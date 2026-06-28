@@ -1778,13 +1778,19 @@
                                 banner.innerHTML = `
                                     <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px 16px; color: #92400e; font-size: 0.85rem;">
                                         <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
-                                        <strong>AI Mock not configured.</strong> Set at least one <code>AI_API_MOCK1</code> through <code>AI_API_MOCK10</code> in environment variables.
+                                        <strong>AI not configured.</strong> Set <code>GEMINI_API_KEY</code> (Google AI Studio) for fast generation, or <code>AI_API_MOCK1</code> for Groq fallback.
                                     </div>`;
-                            } else {
+                            } else if (data.geminiEnabled) {
                                 banner.innerHTML = `
                                     <div style="background: #d1fae5; border: 1px solid #22c55e; border-radius: 8px; padding: 12px 16px; color: #166534; font-size: 0.85rem;">
                                         <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
-                                        <strong>AI Mock connected (${data.apiKeyCount || 1} key${data.apiKeyCount > 1 ? 's' : ''}).</strong> Parallel generation enabled for ${data.model || 'unknown'}.
+                                        <strong>Gemini AI connected (${data.geminiModel}).</strong> Fast generation with 1M TPM free tier.
+                                    </div>`;
+                            } else {
+                                banner.innerHTML = `
+                                    <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px 16px; color: #92400e; font-size: 0.85rem;">
+                                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                                        <strong>Groq fallback only (${data.groqKeys} key(s)).</strong> Limited to 12K TPM — generation will be slow.
                                     </div>`;
                             }
                         }
