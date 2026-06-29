@@ -461,8 +461,7 @@
                 </a>
                 
                 <button class="mobile-menu-btn" aria-expanded="false">
-                    <i class="fas fa-bars"></i>
-                </button>
+                    </button>
                 
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
@@ -558,7 +557,7 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-plus"></i> Create Paper
+                        Create Paper
                     </button>
                 </form>
             </div>
@@ -582,7 +581,7 @@
                         <input type="file" id="pdfFiles" class="form-control" accept=".pdf" multiple required>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
-                        <i class="fas fa-upload"></i> Upload PDFs
+                        Upload PDFs
                     </button>
                 </form>
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #e2e8f0;">
@@ -603,12 +602,12 @@
                         <input type="file" id="syllabusFile" class="form-control" accept=".pdf" required>
                     </div>
                     <button type="submit" class="btn btn-outline" style="width: 100%;">
-                        <i class="fas fa-upload"></i> Upload Syllabus
+                        Upload Syllabus
                     </button>
                 </form>
                 <div id="aiStatusBanner"></div>
                 <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="showAddQuestionsModal()">
-                    <i class="fas fa-pen"></i> Add Questions Manually (if AI fails)
+                    Add Questions Manually (if AI fails)
                 </button>
             </div>
 
@@ -702,7 +701,7 @@
                     </div>
                 </div>
                 <button class="btn btn-primary" style="width: 100%; margin-bottom: 20px;" onclick="saveCompetitiveExamConfig()">
-                    <i class="fas fa-save"></i> Save Exam Config
+                    Save Exam Config
                 </button>
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #e2e8f0;">
@@ -725,7 +724,7 @@
                                 <input type="file" class="form-control" accept=".pdf" multiple required>
                             </div>
                             <button type="submit" class="btn btn-outline" style="width: 100%;">
-                                <i class="fas fa-upload"></i> Upload PYQ PDFs
+                                Upload PYQ PDFs
                             </button>
                         </form>
                     </div>
@@ -746,7 +745,7 @@
                                 <input type="file" class="form-control" accept=".pdf" multiple required>
                             </div>
                             <button type="submit" class="btn btn-outline" style="width: 100%;">
-                                <i class="fas fa-upload"></i> Upload Syllabus PDFs
+                                Upload Syllabus PDFs
                             </button>
                         </form>
                     </div>
@@ -776,11 +775,11 @@
             <div id="questionsContainer"></div>
             
             <button onclick="addQuestionRow()" class="btn btn-outline" style="width: 100%; margin: 15px 0;">
-                <i class="fas fa-plus"></i> Add Another Question
+                Add Another Question
             </button>
             
             <button onclick="saveQuestions()" class="btn btn-primary" style="width: 100%;">
-                <i class="fas fa-save"></i> Save All Questions
+                Save All Questions
             </button>
         </div>
     </div>
@@ -1082,9 +1081,9 @@
                                 </div>
                             </div>
                             <div class="pending-actions">
-                                ${materialUrl ? `<a href="${escapeHtml(materialUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 6px 15px; font-size: 0.85rem;"><i class="fas fa-eye"></i> Open Material</a>` : ''}
-                                <button onclick="savePendingContribution('${id}')" class="btn btn-outline" style="padding: 6px 15px; font-size: 0.85rem;"><i class="fas fa-save"></i> Save Changes</button>
-                                <button onclick="approveMaterial('${id}')" class="btn btn-primary" style="padding: 6px 15px; font-size: 0.85rem;"><i class="fas fa-check"></i> Approve & Publish</button>
+                                ${materialUrl ? `<a href="${escapeHtml(materialUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 6px 15px; font-size: 0.85rem;">Open Material</a>` : ''}
+                                <button onclick="savePendingContribution('${id}')" class="btn btn-outline" style="padding: 6px 15px; font-size: 0.85rem;">Save Changes</button>
+                                <button onclick="approveMaterial('${id}')" class="btn btn-primary" style="padding: 6px 15px; font-size: 0.85rem;">Approve & Publish</button>
                             </div>
                         </div>
                             `;
@@ -1130,8 +1129,8 @@
                                 </div>
                             </div>
                             <div class="pending-actions" style="margin-top: 0;">
-                                ${material.url ? `<a href="${material.url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-eye"></i> Open</a>` : ''}
-                                <button onclick="deleteMaterial('${material._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i> Delete</button>
+                                ${material.url ? `<a href="${material.url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;">Open</a>` : ''}
+                                <button onclick="deleteMaterial('${material._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;">Delete</button>
                             </div>
                         </div>
                     `).join('');
@@ -1363,8 +1362,8 @@
                                 </div>
                             </div>
                             <div class="pending-actions" style="margin-top: 0; flex-wrap: wrap;">
-                                ${p.pdfUrl ? `<a href="${p.pdfUrl}" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF</a>` : ''}
-                                <button onclick="deleteMockTest('${p._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i></button>
+                                ${p.pdfUrl ? `<a href="${p.pdfUrl}" target="_blank" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;">PDF</a>` : ''}
+                                <button onclick="deleteMockTest('${p._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"></button>
                             </div>
                         </div>
                     `;
@@ -1740,7 +1739,7 @@
                                 </div>
                             </div>
                             <div class="pending-actions" style="margin-top: 0;">
-                                <button onclick="deleteCompetitiveExam('${c.examName}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fas fa-trash"></i></button>
+                                <button onclick="deleteCompetitiveExam('${c.examName}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;"></button>
                             </div>
                         </div>
                         `;
