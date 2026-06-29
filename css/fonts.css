@@ -55,6 +55,24 @@
 }
 
 @font-face {
+  font-family: 'Space Mono';
+  src: url('../assets/fonts/space_mono/SpaceMono-Regular.woff2') format('woff2'),
+       url('../assets/fonts/space_mono/SpaceMono-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tw Cen MT Bold';
+  src: url('../assets/fonts/tw_cen_mt/Tw Cen MT Bold.woff2') format('woff2'),
+       url('../assets/fonts/tw_cen_mt/Tw Cen MT Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Gagalin';
   src: url('../assets/fonts/gagalin/Gagalin-Regular.woff2') format('woff2'),
        url('../assets/fonts/gagalin/Gagalin-Regular.woff') format('woff');
@@ -62,3 +80,12 @@
   font-style: normal;
   font-display: swap;
 }
+
+@font-face {
+  font-family: 'Orator Std';
+  src: url('../assets/fonts/orator_std/OratorStd.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
