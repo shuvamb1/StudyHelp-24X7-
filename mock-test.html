@@ -8,6 +8,7 @@
     <script src="js/page-loader.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/filter-system.css">
     <style>
         .mock-container {
             max-width: 1200px;
@@ -22,69 +23,6 @@
         }
         .mock-hero p {
             display: none;
-        }
-
-        .mock-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 30px;
-            margin: 40px 0;
-        }
-        .mock-filter-sidebar {
-            background: var(--bg-white);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid #E2E8F0;
-            align-self: start;
-        }
-        .mock-filter-section {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #E2E8F0;
-        }
-        .mock-filter-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .mock-filter-title {
-            font-family: var(--font-heading);
-            font-size: 1.05rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        .mock-filter-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        .mock-filter-option input[type="checkbox"] {
-            margin-right: 10px;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary-color);
-        }
-        .mock-search-bar {
-            display: flex;
-            margin-bottom: 30px;
-        }
-        .mock-search-input {
-            flex-grow: 1;
-            padding: 12px 20px;
-            border: 1px solid #E2E8F0;
-            border-radius: var(--border-radius) 0 0 var(--border-radius);
-            font-family: var(--font-body);
-        }
-        .mock-search-btn {
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border: none;
-            padding: 0 25px;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            cursor: pointer;
-            font-weight: 600;
         }
 
         .papers-grid {
@@ -559,21 +497,6 @@
         }
 
         @media (max-width: 768px) {
-            .mock-layout { grid-template-columns: 1fr; }
-            .mock-search-bar { flex-direction: row; gap: 8px; }
-            .mock-search-input {
-                border-radius: var(--border-radius) !important;
-                width: 100%;
-            }
-            .mock-search-btn {
-                border-radius: var(--border-radius) !important;
-                padding: 12px 20px;
-                width: auto;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .mock-search-text { display: none; }
             .papers-grid { grid-template-columns: 1fr; }
             .paper-card-footer { flex-direction: column; }
             .test-sidebar { display: none; }
@@ -592,8 +515,7 @@
                     <img src="assets/images/logo.svg" alt="StudyHelp 24x7 Logo" class="logo-img">
                 </a>
                 <button class="mobile-menu-btn" aria-expanded="false">
-                    <i class="fas fa-bars"></i>
-                </button>
+                    </button>
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="materials.html">Study Materials</a></li>
@@ -616,52 +538,7 @@
     <main class="mock-container container" style="padding-top:90px;" id="main-content">
         <!-- Paper Selection Screen -->
         <div id="selection-screen">
-            <div class="mock-layout">
-                <!-- Sidebar Filters -->
-                <aside class="mock-filter-sidebar">
-                    <h3 style="margin-bottom: 20px;"><i class="fas fa-filter"></i> Filters</h3>
-
-                    <div class="mock-filter-section">
-                        <h4 class="mock-filter-title">Department</h4>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Computer Science"> Computer Science</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Microbiology"> Microbiology</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Mathematics"> Mathematics</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Statistics"> Statistics</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-dept" value="Physics"> Physics</label>
-                    </div>
-
-                    <div class="mock-filter-section">
-                        <h4 class="mock-filter-title">Semester</h4>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester I"> Semester I</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester II"> Semester II</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester III"> Semester III</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester IV"> Semester IV</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester V"> Semester V</label>
-                        <label class="mock-filter-option"><input type="checkbox" class="filter-sem" value="Semester VI"> Semester VI</label>
-                    </div>
-
-                    <button class="btn btn-primary" id="apply-filters-btn" style="width: 100%;">Apply Filters</button>
-                </aside>
-
-                <!-- Papers Content -->
-                <section class="mock-content">
-                    <div class="mock-search-bar">
-                        <input type="text" class="mock-search-input" id="mock-search" placeholder="Search for subjects, topics, or paper titles...">
-                        <button class="mock-search-btn"><i class="fas fa-search"></i><span class="mock-search-text"> Search</span></button>
-                    </div>
-
-                    <div id="papers-loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
-                        Loading available papers...
-                    </div>
-                    <div id="papers-grid" class="papers-grid"></div>
-                    <div id="no-papers" style="display: none; text-align: center; padding: 60px 20px;">
-                        <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 15px;"></i>
-                        <h3>No papers available yet</h3>
-                        <p class="text-muted">Check back later. Admin will upload PYQ papers soon.</p>
-                    </div>
-                </section>
-            </div>
+            <div id="mock-filter-system"></div>
         </div>
 
         <!-- Configure Test Screen -->
@@ -718,8 +595,8 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 30px;">
-                    <button class="btn btn-outline" onclick="showSelectionScreen()" style="margin-right: 15px;"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button class="btn btn-primary" id="start-test-btn"><i class="fas fa-magic"></i> Generate & Start Test</button>
+                    <button class="btn btn-outline" onclick="showSelectionScreen()" style="margin-right: 15px;">Back</button>
+                    <button class="btn btn-primary" id="start-test-btn">Generate & Start Test</button>
                 </div>
             </div>
         </div>
@@ -734,7 +611,7 @@
             </div>
             <div class="test-timer" id="test-timer">60:00</div>
             <button class="btn btn-primary" onclick="confirmSubmit()" style="padding: 8px 20px; font-size: 0.85rem;">
-                <i class="fas fa-check-circle"></i> Submit
+                Submit
             </button>
         </div>
         <div class="test-body">
@@ -758,11 +635,10 @@
                     <div class="options-list" id="q-options"></div>
                     <div class="question-actions">
                         <button class="btn btn-outline" id="btn-prev" onclick="prevQuestion()">
-                            <i class="fas fa-chevron-left"></i> Previous
+                            Previous
                         </button>
                         <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">
-                            Next <i class="fas fa-chevron-right"></i>
-                        </button>
+                            Next </button>
                     </div>
                 </div>
             </div>
@@ -820,10 +696,10 @@
         </div>
         <div style="text-align: center; margin-bottom: 30px;">
             <button class="btn btn-outline" onclick="showSelectionScreen()" style="margin-right: 10px;">
-                <i class="fas fa-arrow-left"></i> Back to Papers
+                Back to Papers
             </button>
             <button class="btn btn-primary" onclick="downloadResult()">
-                <i class="fas fa-download"></i> Download Result
+                Download Result
             </button>
         </div>
         <h3 style="margin-bottom: 15px;"><i class="fas fa-list-alt" style="color: var(--primary-color);"></i> Detailed Analysis</h3>
@@ -871,6 +747,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/filter-system.js"></script>
     <script src="js/mock-test.js"></script>
 </body>
 </html>
