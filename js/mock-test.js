@@ -27,9 +27,15 @@
 
     // ====== LOAD PAPERS ======
     async function fetchPapers() {
-        const loading = document.getElementById('papers-loading');
-        const grid = document.getElementById('papers-grid');
+        const container = document.getElementById('mock-filter-system');
         const noPapers = document.getElementById('no-papers');
+
+        if (!container) {
+            console.error('mock-filter-system element not found');
+            return;
+        }
+
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>Loading papers...</p>';
 
         try {
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/papers`, {
@@ -38,46 +44,89 @@
             if (!res.ok) throw new Error('Failed to load');
             papers = await res.json();
 
-            loading.style.display = 'none';
             if (!papers.length) {
-                grid.innerHTML = '';
-                noPapers.style.display = 'block';
+                container.innerHTML = '';
+                if (noPapers) noPapers.style.display = 'block';
                 return;
             }
-            noPapers.style.display = 'none';
+            if (noPapers) noPapers.style.display = 'none';
 
-            grid.innerHTML = papers.map((paper, idx) => {
-                const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
+            function onRenderCard(item, index) {
+                const pdfCount = (item.pdfFiles && item.pdfFiles.length) || (item.pdfUrl ? 1 : 0);
                 const hasPDFs = pdfCount > 0;
                 return `
-                <div class="paper-card ${hasPDFs ? '' : 'paper-card-disabled'}" data-idx="${idx}" data-title="${escapeHtml(paper.title)}" data-subject="${escapeHtml(paper.subject)}" data-dept="${escapeHtml(paper.department)}" data-sem="${escapeHtml(paper.semester)}">
-                    <div class="paper-badge" style="margin-bottom: 10px;">${escapeHtml(paper.department)}</div>
-                    <div class="paper-title">${escapeHtml(paper.title)}</div>
-                    <div class="paper-meta">
-                        <span><i class="fas fa-book"></i> ${escapeHtml(paper.subject)}</span>
-                        <span><i class="fas fa-calendar"></i> ${escapeHtml(paper.semester)}</span>
-                        <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(paper.year || 'N/A')}</span>
+                    <span class="card-badge">${escapeHtml(item.department)}</span>
+                    <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                    <div class="card-meta">
+                        <span><i class="fas fa-book"></i> ${escapeHtml(item.subject)}</span>
+                        <span class="meta-divider">&bull;</span>
+                        <span><i class="fas fa-calendar"></i> ${escapeHtml(item.semester)}</span>
+                        <span class="meta-divider">&bull;</span>
+                        <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(item.year || 'N/A')}</span>
+                        <span class="meta-divider">&bull;</span>
                         <span><i class="fas fa-file-pdf"></i> ${pdfCount} PYQ PDF(s)</span>
                     </div>
                     <div class="paper-card-footer">
-                        <button class="btn btn-give-test ${hasPDFs ? '' : 'disabled'}" ${hasPDFs ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForPaper(${idx})">Give Test</button>
-                        <button class="btn btn-past-results" onclick="event.stopPropagation(); window.showPastResultsForPaper(${idx})">Past Results</button>
+                        <button class="btn btn-give-test" ${hasPDFs ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForPaper('${escapeHtml(item._id)}')">Give Test</button>
+                        <button class="btn btn-past-results" onclick="event.stopPropagation(); window.showPastResultsForPaper('${escapeHtml(item._id)}')">Past Results</button>
                     </div>
-                    ${hasPDFs ? '' : '<div style="margin-top:12px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
-                </div>
-            `;
-            }).join('');
+                    ${hasPDFs ? '' : '<div style="margin-top:8px; padding:8px 12px; background:#fef3c7; border-radius:6px; font-size:0.8rem; color:#92400e; text-align:center;"><i class="fas fa-clock"></i> Questions coming soon</div>'}
+                `;
+            }
 
-            grid.querySelectorAll('.paper-card').forEach((card, index) => {
-                const paper = papers[index];
-                const pdfCount = (paper.pdfFiles && paper.pdfFiles.length) || (paper.pdfUrl ? 1 : 0);
-                if (pdfCount > 0) {
-                    card.style.cursor = 'pointer';
-                    card.addEventListener('click', () => showConfigureScreen(paper));
-                }
+            const fs = new window.FilterSystem({
+                container: container,
+                data: papers,
+                filters: [
+                    {
+                        key: 'department',
+                        label: 'Department',
+                        options: [
+                            { value: 'Computer Science', label: 'Computer Science' },
+                            { value: 'Microbiology', label: 'Microbiology' },
+                            { value: 'Mathematics', label: 'Mathematics' },
+                            { value: 'Statistics', label: 'Statistics' },
+                            { value: 'Physics', label: 'Physics' }
+                        ]
+                    },
+                    {
+                        key: 'semester',
+                        label: 'Semester',
+                        options: [
+                            { value: 'Semester I', label: 'Semester I' },
+                            { value: 'Semester II', label: 'Semester II' },
+                            { value: 'Semester III', label: 'Semester III' },
+                            { value: 'Semester IV', label: 'Semester IV' },
+                            { value: 'Semester V', label: 'Semester V' },
+                            { value: 'Semester VI', label: 'Semester VI' }
+                        ]
+                    }
+                ],
+                sortOptions: [
+                    { value: 'latest', label: 'Latest' },
+                    { value: 'oldest', label: 'Oldest' },
+                    { value: 'az', label: 'Alphabetical' }
+                ],
+                itemsPerPage: 12,
+                onRender: onRenderCard
             });
+            fs.init();
+
+            // Card click handler (for non-button clicks on cards with PDFs)
+            fs.cardsGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.card-item');
+                if (!card) return;
+                if (e.target.closest('button')) return;
+                const paperId = card.dataset._id;
+                if (!paperId) return;
+                const paper = papers.find(p => p._id === paperId);
+                const pdfCount = (paper?.pdfFiles && paper.pdfFiles.length) || (paper?.pdfUrl ? 1 : 0);
+                if (pdfCount > 0 && paper) showConfigureScreen(paper);
+            });
+
         } catch (err) {
-            loading.innerHTML = '<p class="text-danger">Failed to load papers. Please try again.</p>';
+            console.error(err);
+            container.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-muted);">Failed to load papers. Please try again.</p>';
         }
     }
 
@@ -918,38 +967,14 @@
         }
     }
 
-    // ====== SEARCH & FILTER ======
-    function filterPapers() {
-        const searchVal = (document.getElementById('mock-search')?.value || '').toLowerCase();
-        const checkedDepts = [...document.querySelectorAll('.filter-dept:checked')].map(cb => cb.value);
-        const checkedSems = [...document.querySelectorAll('.filter-sem:checked')].map(cb => cb.value);
-
-        document.querySelectorAll('#papers-grid .paper-card').forEach(card => {
-            const title = (card.dataset.title || '').toLowerCase();
-            const subject = (card.dataset.subject || '').toLowerCase();
-            const dept = card.dataset.dept || '';
-            const sem = card.dataset.sem || '';
-
-            const matchesSearch = !searchVal || title.includes(searchVal) || subject.includes(searchVal);
-            const matchesDept = !checkedDepts.length || checkedDepts.includes(dept);
-            const matchesSem = !checkedSems.length || checkedSems.includes(sem);
-
-            card.style.display = (matchesSearch && matchesDept && matchesSem) ? '' : 'none';
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('mock-search')?.addEventListener('input', filterPapers);
-        document.getElementById('apply-filters-btn')?.addEventListener('click', filterPapers);
-    });
-
-    window.startTestForPaper = function(idx) {
-        const paper = papers[idx];
+    // ====== PAPER ACTIONS ======
+    window.startTestForPaper = function(paperId) {
+        const paper = papers.find(p => p._id === paperId);
         if (paper) showConfigureScreen(paper);
     };
 
-    window.showPastResultsForPaper = async function(idx) {
-        const paper = papers[idx];
+    window.showPastResultsForPaper = async function(paperId) {
+        const paper = papers.find(p => p._id === paperId);
         if (!paper) return;
         selectionScreen.style.display = 'none';
         instructionsScreen.style.display = 'none';
