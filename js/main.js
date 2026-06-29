@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
   revealOnScroll(); // trigger once on load
 
   // FAQ Accordion Toggle
-  document.querySelectorAll('.faq-item').forEach(item => {
+  document.querySelectorAll('.faq-item, .faq-item-dark').forEach(item => {
     item.addEventListener('click', () => {
       const isOpen = item.classList.contains('open');
       // Close all open items
-      document.querySelectorAll('.faq-item.open').forEach(openItem => {
+      document.querySelectorAll('.faq-item.open, .faq-item-dark.open').forEach(openItem => {
         openItem.classList.remove('open');
       });
       // Open clicked one if it was closed
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
           </div>
       `;
-      
+
       const profileHtmlMobile = `
           <div style="padding: 15px 0; border-top: 1px solid #E2E8F0; margin-top: 10px;">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
@@ -286,14 +286,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const deptSlides = document.querySelectorAll('.dept-slide');
   if (deptSlides.length > 0) {
       let currentSlide = 0;
-      
-      const nextSlide = () => {
-          deptSlides[currentSlide].classList.remove('active');
-          currentSlide = (currentSlide + 1) % deptSlides.length;
-          deptSlides[currentSlide].classList.add('active');
+      let isAnimating = false;
+
+      const goToSlide = (nextIndex) => {
+          if (isAnimating || nextIndex === currentSlide) return;
+          isAnimating = true;
+
+          const outgoing = deptSlides[currentSlide];
+          const incoming = deptSlides[nextIndex];
+
+          // Snap incoming slide to off-right (no transition) before activating
+          incoming.style.transition = 'none';
+          incoming.classList.remove('slide-out', 'active');
+          // Force reflow so the transition-none takes effect
+          incoming.offsetWidth;
+          incoming.style.transition = '';
+
+          // Slide current out to the left
+          outgoing.classList.add('slide-out');
+          outgoing.classList.remove('active');
+
+          // Slide next in from the right
+          incoming.classList.add('active');
+
+          currentSlide = nextIndex;
+
+          // Clean up slide-out class after animation finishes.
+          // Disable transition first so removing 'slide-out' snaps the slide
+          // instantly back to its default off-right position without animating.
+          outgoing.addEventListener('transitionend', () => {
+              outgoing.style.transition = 'none';
+              outgoing.classList.remove('slide-out');
+              outgoing.offsetWidth; // force reflow
+              outgoing.style.transition = '';
+              isAnimating = false;
+          }, { once: true });
       };
-      
-      // Change slide every 4 seconds
-      setInterval(nextSlide, 4000);
+
+      // Auto-advance every 4 seconds
+      setInterval(() => {
+          goToSlide((currentSlide + 1) % deptSlides.length);
+      }, 4000);
   }
 });
