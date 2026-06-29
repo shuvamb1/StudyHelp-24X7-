@@ -218,7 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fetch(`${API_BASE_URL}/api/user/profile`, {
           headers: { 'Authorization': 'Bearer ' + token }
-      }).then(res => res.json()).then(data => {
+      }).then(res => {
+          const ct = res.headers.get('content-type') || '';
+          if (!res.ok || !ct.includes('application/json')) return null;
+          return res.json();
+      }).then(data => {
           if (data && !data.error) {
               localStorage.setItem('user', JSON.stringify(data));
               const dC = document.getElementById('nav-downloads-count');
@@ -230,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
               if (mDc) mDc.innerText = data.downloadsCount || 0;
               if (mCc) mCc.innerText = data.contributionsCount || 0;
           }
-      }).catch(err => console.error(err));
+      }).catch(err => console.error('Profile fetch failed:', err));
   }
 
   if (window.location.pathname.includes('contribute.html')) {
@@ -240,7 +244,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Notice Fetcher
   if (!sessionStorage.getItem('noticeShown')) {
       fetch(`${API_BASE_URL}/api/notices/active`)
-        .then(res => res.json())
+        .then(res => {
+            const ct = res.headers.get('content-type') || '';
+            if (!res.ok || !ct.includes('application/json')) return null;
+            return res.json();
+        })
         .then(data => {
             if (data && data.message) {
                 const noticeHtml = `
