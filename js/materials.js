@@ -112,7 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/materials`);
-            if (!response.ok) throw new Error(`Failed to load materials (${response.status})`);
+            const ct = response.headers.get('content-type') || '';
+            if (!response.ok || !ct.includes('application/json')) {
+                throw new Error(`Unexpected response (${response.status})`);
+            }
             materialsData = await response.json();
 
             // Initialize FilterSystem
