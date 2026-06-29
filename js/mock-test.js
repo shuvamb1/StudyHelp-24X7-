@@ -41,7 +41,10 @@
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/papers`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-            if (!res.ok) throw new Error('Failed to load');
+            const ct = res.headers.get('content-type') || '';
+            if (!res.ok || !ct.includes('application/json')) {
+                throw new Error(`Unexpected response (${res.status})`);
+            }
             papers = await res.json();
 
             if (!papers.length) {
