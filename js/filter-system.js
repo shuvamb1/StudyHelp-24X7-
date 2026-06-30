@@ -194,7 +194,12 @@ class FilterSystem {
         item.addEventListener('click', (e) => {
           e.stopPropagation();
           const checkbox = item.querySelector('input[type="checkbox"]');
-          checkbox.checked = !checkbox.checked;
+          // If clicking directly on the checkbox, browser already toggled it;
+          // just read its new state. Otherwise toggle it manually.
+          const wasCheckboxClick = e.target === checkbox || e.target.closest('input[type="checkbox"]');
+          if (!wasCheckboxClick) {
+            checkbox.checked = !checkbox.checked;
+          }
           this._toggleFilterValue(filterDef.key, opt.value, checkbox.checked);
           item.classList.toggle('selected', checkbox.checked);
           this._updateDropdownLabel(filterDef.key, btn);
