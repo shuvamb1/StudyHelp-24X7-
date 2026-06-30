@@ -322,13 +322,21 @@ document.addEventListener('DOMContentLoaded', () => {
           // Clean up slide-out class after animation finishes.
           // Disable transition first so removing 'slide-out' snaps the slide
           // instantly back to its default off-right position without animating.
-          outgoing.addEventListener('transitionend', () => {
+          const cleanUp = () => {
               outgoing.style.transition = 'none';
               outgoing.classList.remove('slide-out');
               outgoing.offsetWidth; // force reflow
               outgoing.style.transition = '';
               isAnimating = false;
-          }, { once: true });
+          };
+
+          // Use transitionend for desktop, but add a timeout fallback
+          // because in mobile the outgoing slide becomes display:none
+          // immediately, so the transitionend event never fires.
+          outgoing.addEventListener('transitionend', cleanUp, { once: true });
+          setTimeout(() => {
+              if (isAnimating) cleanUp();
+          }, 800);
       };
 
       // Auto-advance every 4 seconds
