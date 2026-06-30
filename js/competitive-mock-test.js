@@ -94,10 +94,6 @@
                     <div class="exam-icon"><i class="fas ${iconClass}"></i></div>
                     <div class="exam-name">${escapeHtml(exam.displayName || exam.examName)}</div>
                     <div class="exam-desc">${escapeHtml(examDescs[exam.examName] || '')}</div>
-                    <div class="exam-meta">
-                        <span><i class="fas fa-file-pdf"></i> ${pyqCount} PYQ PDF(s)</span> &middot;
-                        <span><i class="fas fa-book"></i> ${syllabusCount} Syllabus</span>
-                    </div>
                     <button class="btn btn-primary ${hasContent ? '' : 'disabled'}" ${hasContent ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForExam(${idx})">
                         <i class="fas fa-play"></i> ${hasContent ? 'Give Test' : 'Coming Soon'}
                     </button>
