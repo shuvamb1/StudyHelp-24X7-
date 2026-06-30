@@ -64,10 +64,6 @@
                         <span><i class="fas fa-book"></i> ${escapeHtml(item.subject)}</span>
                         <span class="meta-divider">&bull;</span>
                         <span><i class="fas fa-calendar"></i> ${escapeHtml(item.semester)}</span>
-                        <span class="meta-divider">&bull;</span>
-                        <span><i class="fas fa-graduation-cap"></i> ${escapeHtml(item.year || 'N/A')}</span>
-                        <span class="meta-divider">&bull;</span>
-                        <span><i class="fas fa-file-pdf"></i> ${pdfCount} PYQ PDF(s)</span>
                     </div>
                     <div class="paper-card-footer">
                         <button class="btn btn-give-test" ${hasPDFs ? '' : 'disabled'} onclick="event.stopPropagation(); window.startTestForPaper('${escapeHtml(item._id)}')">Give Test</button>
