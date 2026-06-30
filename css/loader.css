@@ -1,3 +1,7 @@
+/* ============================================
+   PAGE LOADER - Interactive with logo
+   ============================================ */
+
 #page-loader {
   position: fixed;
   inset: 0;
@@ -6,7 +10,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 24px;
   background: #ffffff;
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
@@ -17,12 +21,14 @@
   pointer-events: none;
 }
 
+/* ---- Spinner container ---- */
 .page-loader-spinner {
-  width: 115px;
-  height: 115px;
+  width: 130px;
+  height: 130px;
   position: relative;
 }
 
+/* Animated gradient ring */
 .page-loader-spinner::before,
 .page-loader-spinner::after {
   content: '';
@@ -30,7 +36,7 @@
   inset: 0;
   border-radius: 50%;
   border: 4px solid transparent;
-  animation: page-loader-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation: page-loader-spin 1.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
 .page-loader-spinner::before {
@@ -39,26 +45,96 @@
 }
 
 .page-loader-spinner::after {
-  border-color: transparent transparent rgba(102, 0, 255, 0.3) transparent;
-  animation-delay: -0.6s;
+  border-color: transparent transparent rgba(102, 0, 255, 0.35) transparent;
+  animation-delay: -0.7s;
 }
 
+/* Pulsing glow ring behind the spinner */
+.page-loader-spinner .glow-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(102,0,255,0.12) 0%, transparent 70%);
+  animation: glow-breathe 2s ease-in-out infinite;
+}
+
+/* Logo */
 .page-loader-logo {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
+  width: 105px;
+  height: 105px;
   object-fit: contain;
   z-index: 1;
+  animation: logo-pulse 2s ease-in-out infinite;
 }
 
+/* Loading text with animated dots */
+.page-loader-text {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-color, #6600ff);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-loader-text .dot {
+  animation: loader-dot 1.4s ease-in-out infinite;
+}
+.page-loader-text .dot:nth-child(2) { animation-delay: 0.2s; }
+.page-loader-text .dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Progress bar (decorative, subtle) */
+.page-loader-progress {
+  width: 140px;
+  height: 3px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.page-loader-progress::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #6600ff, #9955ff);
+  border-radius: 3px;
+  animation: progress-slide 1.5s ease-in-out infinite;
+}
+
+/* ---- Animations ---- */
 @keyframes page-loader-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.4; }
+}
+
+@keyframes logo-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes loader-dot {
+  0%, 100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+@keyframes progress-slide {
+  0% { left: -40%; width: 40%; }
+  50% { width: 60%; }
+  100% { left: 100%; width: 40%; }
 }
