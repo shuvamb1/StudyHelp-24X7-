@@ -1023,6 +1023,11 @@ footer {
   padding-right: 0;
 }
 
+#dept-slider-section .container {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .dept-section-dark .department-carousel-container {
   margin-top: 20px;
 }
@@ -1574,7 +1579,7 @@ footer {
 
 .dept-slide-content {
     width: 35%;
-    padding: 60px 70px 60px 0;
+    padding: 60px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1650,7 +1655,7 @@ footer {
     /* Expand text to full width */
     .dept-slide-content {
         width: 100%;
-        padding: 40px 20px;
+        padding: 40px 0;
         text-align: center;
         align-items: center;
     }
