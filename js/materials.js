@@ -36,17 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 { value: 'Question Banks', label: 'Question Banks' },
                 { value: 'Reference Books', label: 'Reference Books' }
             ]
-        },
-        {
-            key: 'year',
-            label: 'Year',
-            options: [
-                { value: '2024', label: '2024' },
-                { value: '2023', label: '2023' },
-                { value: '2022', label: '2022' },
-                { value: '2021', label: '2021' },
-                { value: '2020', label: '2020' }
-            ]
         }
     ];
 
@@ -123,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 container: container,
                 data: materialsData,
                 filters: filterDefinitions,
-                itemsPerPage: 12,
+                itemsPerPage: 15,
                 onRender: onRenderCard,
                 onDownload: onDownload
             });
