@@ -20,6 +20,7 @@
     let currentQuestionIndex = 0;
     let answers = {};
     let timerInterval = null;
+    let pollInterval = null;
     let secondsLeft = 0;
     let testActive = false;
     let blurCount = 0;
@@ -224,6 +225,7 @@
         answers = {}; // reset answers for new test
 
         try {
+            // Step 1: Start generation (returns immediately with sessionId)
             const res = await fetch(`${API_BASE_URL}/api/mock-tests/${currentPaper._id}/start`, {
                 method: 'POST',
                 headers: {
@@ -241,49 +243,99 @@
                 return;
             }
 
-            testId = data.testId;
-            questions = data.questions;
-            secondsLeft = data.duration * 60;
+            const sessionId = data.sessionId;
+            if (!sessionId) {
+                alert('Server did not return a session ID.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
+                return;
+            }
 
-            // Update test header
-            document.getElementById('test-paper-title').textContent = data.paper.title;
-            document.getElementById('test-timer').textContent = formatTime(secondsLeft);
-            document.getElementById('test-progress').textContent = `Question 1 of ${questions.length}`;
+            // Step 2: Poll for completion
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating questions...';
+            let pollCount = 0;
+            pollInterval = setInterval(async () => {
+                pollCount++;
+                try {
+                    const pollRes = await fetch(`${API_BASE_URL}/api/mock-tests/session/${sessionId}`, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    const pollData = await pollRes.json();
 
-            // Build nav grid
-            const navGrid = document.getElementById('question-nav-grid');
-            navGrid.innerHTML = questions.map((_, i) =>
-                `<button class="q-nav-btn ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="window.goToQuestion(${i})">${i + 1}</button>`
-            ).join('');
+                    if (!pollRes.ok) {
+                        clearInterval(pollInterval);
+                        alert(pollData.error || 'Error checking generation status.');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
+                        return;
+                    }
 
-            // Show test screen
-            instructionsScreen.style.display = 'none';
-            testScreen.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            testActive = true;
-            securityViolationShown = false;
-            blurCount = 0;
+                    if (pollData.status === 'failed') {
+                        clearInterval(pollInterval);
+                        alert('Question generation failed: ' + (pollData.error || 'Unknown error'));
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
+                        return;
+                    }
 
-            // Request fullscreen immediately
-            document.documentElement.requestFullscreen().catch(() => {});
+                    if (pollData.status === 'ready') {
+                        clearInterval(pollInterval);
+                        testId = pollData.testId;
+                        questions = pollData.questions;
+                        secondsLeft = pollData.duration * 60;
 
-            // Start timer
-            timerInterval = setInterval(() => {
-                secondsLeft--;
-                const timerEl = document.getElementById('test-timer');
-                timerEl.textContent = formatTime(secondsLeft);
-                if (secondsLeft <= 300) timerEl.classList.add('warning');
-                if (secondsLeft <= 60) timerEl.classList.add('danger');
-                if (secondsLeft <= 0) { clearInterval(timerInterval); submitTest(); }
-            }, 1000);
+                        // Update test header
+                        document.getElementById('test-paper-title').textContent = pollData.paper.title;
+                        document.getElementById('test-timer').textContent = formatTime(secondsLeft);
+                        document.getElementById('test-progress').textContent = `Question 1 of ${questions.length}`;
 
-            renderQuestion(0);
-            attachAntiCheat();
+                        // Build nav grid
+                        const navGrid = document.getElementById('question-nav-grid');
+                        navGrid.innerHTML = questions.map((_, i) =>
+                            `<button class="q-nav-btn ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="window.goToQuestion(${i})">${i + 1}</button>`
+                        ).join('');
 
-            // Hide all overlays just in case
-            document.getElementById('blur-overlay').style.display = 'none';
-            document.getElementById('tab-warning-overlay').style.display = 'none';
-            document.getElementById('security-overlay').style.display = 'none';
+                        // Show test screen
+                        instructionsScreen.style.display = 'none';
+                        testScreen.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                        testActive = true;
+                        securityViolationShown = false;
+                        blurCount = 0;
+
+                        // Request fullscreen immediately
+                        document.documentElement.requestFullscreen().catch(() => {});
+
+                        // Start timer
+                        timerInterval = setInterval(() => {
+                            secondsLeft--;
+                            const timerEl = document.getElementById('test-timer');
+                            timerEl.textContent = formatTime(secondsLeft);
+                            if (secondsLeft <= 300) timerEl.classList.add('warning');
+                            if (secondsLeft <= 60) timerEl.classList.add('danger');
+                            if (secondsLeft <= 0) { clearInterval(timerInterval); submitTest(); }
+                        }, 1000);
+
+                        renderQuestion(0);
+                        attachAntiCheat();
+
+                        // Hide all overlays just in case
+                        document.getElementById('blur-overlay').style.display = 'none';
+                        document.getElementById('tab-warning-overlay').style.display = 'none';
+                        document.getElementById('security-overlay').style.display = 'none';
+                    }
+                    // else still generating — keep polling
+                } catch (err) {
+                    console.error('Polling error:', err);
+                    // Don't stop polling on transient network errors; stop after ~5 min
+                    if (pollCount > 150) { // ~5 minutes at 2s intervals
+                        clearInterval(pollInterval);
+                        alert('Generation is taking too long. Please try again later.');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-play"></i> Generate & Start Test';
+                    }
+                }
+            }, 2000);
 
         } catch (err) {
             console.error(err);
@@ -468,6 +520,7 @@
         if (!testActive) return;
         testActive = false;
         clearInterval(timerInterval);
+        clearInterval(pollInterval);
         detachAntiCheat();
 
         const timeTaken = Math.round((currentPaper.duration || 60) * 60 - secondsLeft);
@@ -589,6 +642,7 @@
         testActive = false;
         securityViolationShown = false;
         clearInterval(timerInterval);
+        clearInterval(pollInterval);
         detachAntiCheat();
 
         // Remove past results modal if present
@@ -636,6 +690,7 @@
         if (!testActive || securityViolationShown) return;
         securityViolationShown = true;
         clearInterval(timerInterval);
+        clearInterval(pollInterval);
 
         const overlay = document.getElementById('security-overlay');
         const msg = document.getElementById('security-msg');
