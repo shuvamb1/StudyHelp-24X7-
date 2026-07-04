@@ -1676,3 +1676,109 @@ footer {
     margin-bottom: 12px;
     display: block;
 }
+
+/* ============================================
+   NAV DROPDOWN - Mock Tests
+   ============================================ */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    padding: 8px 0;
+    min-width: 200px;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-left: 1px solid #E2E8F0;
+    border-top: 1px solid #E2E8F0;
+    transform: rotate(45deg);
+}
+
+.nav-dropdown-menu li {
+    list-style: none;
+}
+
+.nav-dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-main);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.nav-dropdown-menu li a:hover {
+    background: rgba(102, 0, 255, 0.05);
+    color: var(--primary-color);
+}
+
+.nav-dropdown:hover .nav-dropdown-menu {
+    display: block;
+}
+
+/* Hide-when-logged-in utility */
+body.logged-in .hide-when-logged-in {
+    display: none !important;
+}
+
+/* Mobile dropdown */
+@media (max-width: 768px) {
+    .nav-dropdown-menu {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        border-left: 2px solid var(--primary-color);
+        border-radius: 0;
+        margin-top: 0;
+        margin-left: 8px;
+        padding: 4px 0;
+        background: transparent;
+    }
+    .nav-dropdown-menu::before {
+        display: none;
+    }
+    .nav-dropdown-menu li a {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+    .nav-dropdown.open .nav-dropdown-menu {
+        display: block;
+    }
+}
+
+.eyebrow-ticker {
+    font-family: 'Orator Std', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-color, #6600FF);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    display: block;
+}
