@@ -56,7 +56,13 @@
                                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="materials.html">Study Materials</a></li>
-                    <li><a href="mock-test.html">Mock Tests</a></li>
+                    <li class="nav-dropdown">
+                        <a href="#" class="nav-dropdown-toggle">Mock Tests <i class="fas fa-chevron-down" style="font-size:0.7rem;margin-left:4px;"></i></a>
+                        <ul class="nav-dropdown-menu">
+                            <li><a href="mock-test.html">For College Exams</a></li>
+                            <li><a href="competitive-mock-test.html">For Competitive Exams</a></li>
+                        </ul>
+                    </li>
                     <li><a href="contribute.html">Contribute</a></li>
                     <li><a href="about.html">About Us</a></li>
                 
@@ -76,6 +82,26 @@
 
     <main class="about-content" style="padding-top:90px;">
         <h2>About The Project</h2>
+        <p>StudyHelp 24x7 is an independent student-led initiative built for the students of St. Xavier's College, Kolkata. What began as a quiet frustration — scrambling through WhatsApp groups and scattered Google Drive links to find decent notes before exams — soon became a mission to build something better, something lasting, for every Xavierian who walks through those gates.</p>
+        <p>The idea took root during a particularly chaotic exam season, when finding reliable study materials felt like searching for a needle in a haystack. Notes were scattered across dozens of chats, previous year papers were locked behind personal drives, and every semester meant starting the hunt all over again. It became clear that the college needed a single, organized, always-accessible platform where students could find what they needed without the stress.</p>
+        <p>From that simple observation, the journey began. The first version of the website was a basic static page with a handful of uploaded PDFs. It was far from perfect, but it worked — and students started using it. Word spread through classrooms and hostel corridors. Feedback poured in. Requests for new departments, new features, and better organization kept coming. Each suggestion shaped the platform into what it is today.</p>
+        <p>Over time, the platform evolved from a simple file repository into a comprehensive academic ecosystem. The study materials section grew to cover six major departments with semester-wise filtering. The contribution system was built so students could give back to the community. The AI-powered mock test system was developed to help students practice with questions generated directly from their own syllabus and previous year papers. And when competitive exam aspirants asked for NEET, JEE, GATE, and WBJEE practice tests, that feature was built too — complete with anti-cheat measures to simulate real exam pressure.</p>
+        <p>Every line of code, every uploaded note, every mock test taken represents a step forward in a journey that is still ongoing. The platform is not backed by any institution or funded by any organization. It is built, maintained, and improved by students who believe that academic resources should be freely accessible to everyone.</p>
+
+        <h2>Our Mission</h2>
+        <p>To democratize access to high-quality academic resources, fostering a collaborative learning environment where every student has the tools they need to succeed academically. We believe that financial constraints, lack of connections, or simply not knowing the right person should never be a barrier to education.</p>
+        <p>We are committed to maintaining a platform that is free, accessible, and constantly improving through community contributions. Every note uploaded, every question paper shared, and every resource contributed helps build a stronger academic ecosystem for current and future students. The goal is simple: if you are a student at St. Xavier's, you should never have to worry about where your next set of notes is coming from.</p>
+
+        <h2>Our Vision</h2>
+        <p>To become the ultimate, most trusted academic companion for every student crossing the threshold of St. Xavier's College, ensuring no one ever struggles alone with their coursework. We envision a campus where knowledge flows freely, where seniors pass down resources to juniors, and where students uplift each other through collaboration rather than competition.</p>
+        <p>Looking ahead, we plan to expand our offerings with more AI-powered study tools, deeper analytics for mock tests, personalized learning recommendations, and broader department coverage. The dream is to make StudyHelp 24x7 not just a website, but a tradition — a digital legacy that every batch of Xavierians inherits, improves, and passes forward.</p>
+
+        <h2>The Journey So Far</h2>
+        <p>The path from idea to reality was anything but smooth. There were late nights debugging code, weekends spent organizing files, and countless iterations based on real student feedback. The backend was built from scratch using Node.js and MongoDB to handle user accounts, material storage, and test sessions. The frontend went through multiple design overhauls to ensure it felt modern, fast, and easy to use on both desktop and mobile.</p>
+        <p>One of the biggest challenges was building the AI mock test system. Training the AI to generate relevant, syllabus-aligned questions from uploaded PDFs required careful prompt engineering and multiple API integrations. The competitive exam module was even more complex — batch processing, rate limiting, anti-cheat mechanisms, and real-time scoring all had to work together seamlessly.</p>
+        <p>Today, StudyHelp 24x7 serves hundreds of active students across six departments with over 2000 study materials, and that number grows every week. None of this would have been possible without the students who contribute their notes, report bugs, suggest features, and simply use the platform. This is not one person's project — it belongs to every Xavierian who believes in sharing knowledge.</p>
+    </main>"about-content" style="padding-top:90px;">
+        <h2>About The Project</h2>
         <p>This website is a project made by Shuvam Bhattacharya, Student of computer science of St Xavier's College for the benefits of all the students of St Xavier's College. What started as a simple idea to share notes among classmates quickly evolved into a comprehensive academic resource hub serving hundreds of students across multiple departments.</p>
         <p>StudyHelp 24x7 was born out of a genuine need — students often struggled to find reliable study materials, especially during exam season. By creating a centralized platform, we aim to eliminate the stress of searching for resources and let students focus on what truly matters: learning.</p>
 
@@ -94,7 +120,7 @@
             <h2>Start Learning Smarter Today</h2>
             <p>Get access to department-wise notes, previous year papers, and AI-powered mock tests — all in one place. Built by Xavierians, for Xavierians. Join 500+ active students across 6 departments with over 2000 study materials at your fingertips.</p>
             <div class="cta-actions">
-                <a href="register.html" class="btn btn-primary">Create Free Account</a>
+                <a href="register.html" class="btn btn-primary hide-when-logged-in">Create Free Account</a>
                 <a href="materials.html" class="btn btn-outline">Explore Materials</a>
             </div>
         </div>
