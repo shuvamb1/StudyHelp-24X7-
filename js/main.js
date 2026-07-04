@@ -21,6 +21,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Mobile dropdown toggle for Mock Tests
+  document.querySelectorAll('.nav-dropdown-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        const dropdown = toggle.closest('.nav-dropdown');
+        dropdown.classList.toggle('open');
+        const icon = toggle.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-chevron-down');
+          icon.classList.toggle('fa-chevron-up');
+        }
+      }
+    });
+  });
+
   // Header Scroll Effect
   const navbar = document.querySelector('nav.navbar');
   window.addEventListener('scroll', () => {
@@ -124,6 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const token = localStorage.getItem('token');
   const userStr = localStorage.getItem('user');
+
+  // Add logged-in class to body for CSS-based hiding
+  if (token && userStr) {
+      document.body.classList.add('logged-in');
+  }
   
   if (token && userStr) {
       const user = JSON.parse(userStr);
