@@ -27,7 +27,13 @@
                 <ul class="nav-links">
                     <li><a href="index.html" style="color: var(--accent-color);">Home</a></li>
                     <li><a href="materials.html">Study Materials</a></li>
-                    <li><a href="mock-test.html">Mock Tests</a></li>
+                    <li class="nav-dropdown">
+                        <a href="#" class="nav-dropdown-toggle">Mock Tests <i class="fas fa-chevron-down" style="font-size:0.7rem;margin-left:4px;"></i></a>
+                        <ul class="nav-dropdown-menu">
+                            <li><a href="mock-test.html">For College Exams</a></li>
+                            <li><a href="competitive-mock-test.html">For Competitive Exams</a></li>
+                        </ul>
+                    </li>
                     <li><a href="contribute.html">Contribute</a></li>
                     <li><a href="about.html">About Us</a></li>
                 
@@ -54,7 +60,7 @@
                 <div class="hero-actions">
                     <a href="materials.html" class="btn btn-accent" style="margin-right: 15px;">Access Materials</a>
                     <a href="mock-test.html" class="btn btn-primary" style="margin-right: 15px;">AI Mock Tests</a>
-                    <a href="register.html" class="btn btn-outline">Join the Community</a>
+                    <a href="register.html" class="btn btn-outline hide-when-logged-in">Join the Community</a>
                 </div>
             </div>
         </section>
@@ -296,7 +302,7 @@
 <h2>Ignite Your Academic Potential Today</h2>
                 <p>Get access to department-wise notes, previous year papers, and AI-powered mock tests — all in one place. Built by Xavierians, for Xavierians. Join 500+ active students across 6 departments with over 2000 study materials at your fingertips.</p>
                 <div class="cta-actions">
-                    <a href="register.html" class="btn btn-primary">Create Free Account</a>
+                    <a href="register.html" class="btn btn-primary hide-when-logged-in">Create Free Account</a>
                     <a href="materials.html" class="btn btn-outline">Explore Materials</a>
                 </div>
             </div>
