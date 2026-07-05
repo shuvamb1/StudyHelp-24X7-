@@ -1198,6 +1198,42 @@
                 }
             };
 
+            window.savePendingContribution = async (id) => {
+                try {
+                    const item = document.getElementById(`item-${id}`);
+                    const inputs = item.querySelectorAll('[data-field]');
+                    const updates = {};
+                    inputs.forEach(input => {
+                        updates[input.dataset.field] = input.value;
+                    });
+                    
+                    const saveBtn = item.querySelector('button[onclick^="savePendingContribution"]');
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    
+                    const res = await fetch(`${API_BASE_URL}/api/admin/contributions/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updates)
+                    });
+                    
+                    if (res.ok) {
+                        saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                        setTimeout(() => { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }, 1500);
+                    } else {
+                        alert('Failed to save changes');
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                    }
+                } catch (err) {
+                    alert('Server error');
+                }
+            };
+
             document.getElementById('noticeForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const msgEl = document.getElementById('noticeMsg');
