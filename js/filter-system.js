@@ -251,7 +251,8 @@ class FilterSystem {
       const vals = this.activeFilters[key];
       if (vals.size === 0) return;
       items = items.filter(item => {
-        const itemVal = String(item[key] ?? '');
+        let itemVal = String(item[key] ?? '');
+        if (key === 'semester') itemVal = itemVal.replace(/^Sem\b/, 'Semester');
         return vals.has(itemVal) || vals.has(itemVal.toLowerCase());
       });
     });
