@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="card-meta">
                 <span><i class="fas fa-building"></i> ${item.subject || item.department || ''}</span>
                 <span class="meta-divider">&bull;</span>
-                <span><i class="fas fa-clock"></i> ${item.semester || ''}</span>
+                <span><i class="fas fa-clock"></i> ${(item.semester || '').replace(/^Sem\b/, 'Semester')}</span>
             </div>
             <div class="card-footer">
                 <span class="footer-note">${item.date || ''}</span>
