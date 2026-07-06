@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { value: 'Semester III', label: 'Semester III' },
                 { value: 'Semester IV', label: 'Semester IV' },
                 { value: 'Semester V', label: 'Semester V' },
-                { value: 'Semester VI', label: 'Semester VI' }
+                { value: 'Semester VI', label: 'Semester VI' },
+                { value: 'Semester VII', label: 'Semester VII' },
+                { value: 'Semester VIII', label: 'Semester VIII' }
             ]
         },
         {
