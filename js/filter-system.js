@@ -232,13 +232,15 @@ class FilterSystem {
     if (this.searchQuery) {
       const q = this.searchQuery;
       items = items.filter(item => {
+        const sem = (item.semester || '').replace(/^Sem\b/, 'Semester');
         const hay = [
           item.title,
           item.name,
           item.subject,
           item.department,
           item.type,
-          item.category
+          item.category,
+          sem
         ].filter(Boolean).join(' ').toLowerCase();
         return hay.includes(q);
       });
