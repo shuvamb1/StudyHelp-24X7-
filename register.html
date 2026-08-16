@@ -137,10 +137,18 @@
             }
 
             const csCinPattern = /^2[3-9]-[24]00-[45]-0[23]-05\d\d$/;
-            if (department === 'cs' && !csCinPattern.test(cin)) {
-                errorMsg.innerText = '❌ Invalid CIN. Computer Science CIN must follow the format 2x-y00-z-0a-0m (e.g. 25-400-5-02-0571).';
-                errorMsg.style.display = 'block';
-                return;
+            if (department === 'cs') {
+                if (!csCinPattern.test(cin)) {
+                    errorMsg.innerText = '❌ Invalid CIN. Computer Science CIN must follow the format 2x-y00-z-0a-0m (e.g. 25-400-5-02-0571).';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                const cinM = parseInt(cin.split('-').pop().slice(1), 10);
+                if (roll !== cinM) {
+                    errorMsg.innerText = '❌ Roll number must match the last part (m) of your CIN (e.g. CIN ending in 0571 → roll 571).';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
             }
 
             btn.disabled = true;
@@ -153,13 +161,13 @@
                     body: JSON.stringify({ name, cin, roll, year, department })
                 });
 
-                const msg = await response.text();
-
                 if (response.ok) {
-                    successMsg.innerText = msg;
-                    successMsg.style.display = 'block';
-                    setTimeout(() => window.location.replace('login.html'), 2000);
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.replace('index.html');
                 } else {
+                    const msg = await response.text();
                     errorMsg.innerText = msg;
                     errorMsg.style.display = 'block';
                     btn.disabled = false;
