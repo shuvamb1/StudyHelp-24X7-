@@ -68,7 +68,7 @@
                 
                 <div class="form-group">
                     <label class="form-label">College Identification Number (CIN) *</label>
-                    <input type="text" id="cinInput" class="form-control" placeholder="Enter your 10-digit CIN" required>
+                    <input type="text" id="cinInput" class="form-control" placeholder="e.g. 25-400-5-02-0571" required>
                 </div>
                 
                 <div class="form-row">
@@ -132,6 +132,13 @@
 
             if (!Number.isInteger(roll) || roll < 500 || roll > 599) {
                 errorMsg.innerText = '❌ Roll number invalid';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            const csCinPattern = /^2[3-9]-[24]00-[45]-0[23]-05\d\d$/;
+            if (department === 'cs' && !csCinPattern.test(cin)) {
+                errorMsg.innerText = '❌ Invalid CIN. Computer Science CIN must follow the format 2x-y00-z-0a-0m (e.g. 25-400-5-02-0571).';
                 errorMsg.style.display = 'block';
                 return;
             }
