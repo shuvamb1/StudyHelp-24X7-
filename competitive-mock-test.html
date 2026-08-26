@@ -9,7 +9,16 @@
     <script src="js/page-loader.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B31J01CXSV"></script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-B31J01CXSV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-B31J01CXSV');
+  sessionStorage.setItem('entryFromIndex', 'true');
+</script>
     <style>
         .comp-mock-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
